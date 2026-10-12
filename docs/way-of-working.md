@@ -5,10 +5,9 @@ the project, make deliberate decisions, keep the code clear, and prove that the 
 It connects product thinking, design, engineering, and delivery so the next person can understand
 both what changed and why.
 
-This guide is for people joining a project, contributing a change, or working alongside an AI
-assistant. You can use it without installing a plugin or learning an agent workflow. It explains
-the shared defaults; the project's own documentation and explicit decisions determine how they
-apply. Client work keeps its own requirements and identity.
+This guide explains the shared approach to building and maintaining projects, from the first
+change through delivery. The project's own documentation and explicit decisions determine how
+these defaults apply. Client work keeps its own requirements and identity.
 
 ## Start here
 
@@ -189,10 +188,10 @@ Report exactly what ran and where it ran. A local test, a passing CI job, a phys
 a successful deployment, and a published package prove different things. If a check is blocked,
 name the command, diagnostic, and remaining action. Never call an unrun check successful.
 
-## Collaborate with people and assistants
+## Collaborate effectively
 
 Give a collaborator the goal, constraints, relevant files, and expected evidence. The same context
-helps a human reviewer and an AI assistant. An assistant can help inspect, implement, test, and
+helps a reviewer and an AI assistant. An assistant can help inspect, implement, test, and
 explain a change; its output still needs review against the real repository and product behavior.
 
 Communicate the outcome first, then the decisions and evidence that matter. Use English for code,

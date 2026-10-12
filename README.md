@@ -26,8 +26,8 @@ Publication and deployment follow the [release plan](docs/release-v0.2.0.md).
 
 ## Understand the way of working
 
-Start with [The santi020k way of working](docs/way-of-working.md), a guide for people joining,
-contributing to, or maintaining a project. It explains how to understand a task, write clear code,
+Start with [The santi020k way of working](docs/way-of-working.md), the practical guide to building
+and maintaining a project. It explains how to understand a task, write clear code,
 choose tools, build usable interfaces, collaborate with assistants, and verify delivery—with a
 practical task walkthrough and examples.
 

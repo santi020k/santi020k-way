@@ -11,7 +11,7 @@ deployment on 2026-10-12. npm publication remains disabled until its publisher i
 
 - Explain the architecture with a responsive author/build/use map, clear ownership boundaries,
   decision links and a setup path; verify keyboard use and enlarged-text reflow.
-- Add a human-focused way-of-working guide, shared through the catalog, CLI, and website, with
+- Add a way-of-working guide, shared through the catalog, CLI, and website, with
   practical examples, a reading map, and implementation versus delivery expectations.
 - Keep presentation audits focused on source packages by excluding dependencies, generated output,
   caches and fixtures while retaining failures for incomplete source metadata.
