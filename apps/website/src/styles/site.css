@@ -65,62 +65,6 @@ input {
 .skip-link:focus {
   top: 1rem;
 }
-.site-header {
-  display: flex;
-  align-items: center;
-  gap: 2rem;
-  min-height: 104px;
-  border-bottom: 1px solid var(--site-line);
-}
-.wordmark {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.7rem;
-  font-weight: 600;
-  letter-spacing: -0.04em;
-  font-size: 1.1rem;
-}
-.brand-mark {
-  display: grid;
-  place-items: center;
-  width: 36px;
-  height: 36px;
-  background: var(--site-brand-solid);
-  color: var(--site-brand-mark-ink);
-  border-radius: 0.65rem;
-  font-family: monospace;
-  letter-spacing: -0.15em;
-  padding-right: 0.2em;
-}
-.wordmark-way {
-  font-weight: 400;
-  color: var(--site-ink-soft);
-}
-.site-header nav {
-  display: flex;
-  align-items: center;
-  gap: 2rem;
-  margin-left: auto;
-}
-.site-header nav a {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.5rem;
-  min-height: 44px;
-  font-size: 0.8125rem;
-  color: var(--site-ink-soft);
-}
-.site-header nav a:hover,
-.site-header nav a[aria-current] {
-  color: var(--site-accent);
-}
-.site-header .ui-theme-toggle {
-  border-color: var(--site-line);
-  color: var(--site-ink);
-  min-width: 44px;
-  min-height: 44px;
-  background: transparent;
-}
 svg {
   width: 1.1rem;
   height: 1.1rem;
@@ -425,37 +369,6 @@ em {
   max-width: 31rem;
   color: var(--site-ink-soft);
 }
-.site-footer {
-  display: grid;
-  grid-template-columns: 1fr auto;
-  gap: 2rem;
-  border-top: 1px solid var(--site-line);
-  padding-block: 2.5rem;
-}
-.footer-brand {
-  font-size: 0.9rem;
-  font-weight: 600;
-}
-.site-footer p {
-  color: var(--site-ink-soft);
-  font-size: 0.6875rem;
-  margin-top: 0.5rem;
-}
-.footer-links {
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
-}
-.footer-links a {
-  display: flex;
-  gap: 0.5rem;
-  align-items: center;
-  min-height: 30px;
-  font-size: 0.7rem;
-}
-.footer-note {
-  grid-column: 1 / -1;
-}
 .page-intro {
   padding: 5rem 0 3.5rem;
 }
@@ -722,24 +635,6 @@ em {
   .shell {
     width: calc(100% - 2.5rem);
   }
-  .site-header {
-    flex-wrap: wrap;
-    gap: 0.5rem 1rem;
-    padding-block: 1rem 0.5rem;
-  }
-  .site-header .ui-theme-toggle {
-    margin-left: auto;
-  }
-  .site-header nav {
-    order: 3;
-    width: 100%;
-    justify-content: space-between;
-    gap: 0.5rem;
-    margin-left: 0;
-  }
-  .site-header nav a {
-    font-size: 0.7rem;
-  }
   .hero {
     grid-template-columns: 1fr;
     padding-block: 3.5rem;
@@ -802,13 +697,6 @@ em {
   }
   .closing {
     padding-block: 4.5rem;
-  }
-  .site-footer {
-    grid-template-columns: 1fr;
-    gap: 1.5rem;
-  }
-  .footer-links a {
-    min-height: 44px;
   }
   .page-intro {
     padding-top: 3.5rem;
