@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict'
 import { spawnSync } from 'node:child_process'
-import { mkdtemp, readFile, realpath, rm, stat } from 'node:fs/promises'
+import { mkdtemp, readFile, realpath, rm, stat, writeFile } from 'node:fs/promises'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import { test } from 'node:test'
@@ -118,5 +118,45 @@ await test('CLI setup and rollback require reviewed hashes and use only the sele
     assert.equal(restored.status, 0, restored.stderr)
 
     await assert.rejects(stat(target), { code: 'ENOENT' })
+  }
+})
+
+await test('rollback errors never expose malformed private receipt content', async t => {
+  const home = await mkdtemp(join(await realpath(tmpdir()), 'way-cli-private-'))
+
+  t.after(() => rm(home, { recursive: true, force: true }))
+
+  const preview = run('setup', 'codex', '--home', home)
+  const { approval } = z.object({ approval: z.string() }).parse(parseJson(preview.stdout))
+  const installed = run('setup', 'codex', '--home', home, '--apply', approval)
+  const { backup } = z.object({ backup: z.string() }).parse(parseJson(installed.stdout))
+  const receiptPath = join(home, 'way', 'backups', `${backup}.json`)
+  const originalReceipt = z.record(z.string(), z.unknown()).parse(parseJson(await readFile(receiptPath, 'utf8')))
+  const originalTarget = await readFile(join(home, 'AGENTS.md'), 'utf8')
+  const privateText = 'PRIVATE'
+
+  for (const malformed of [
+    privateText,
+    `{"before":"${privateText}"`,
+    JSON.stringify({ ...originalReceipt, agent: privateText }),
+    JSON.stringify({ ...originalReceipt, before: [privateText] })
+  ]) {
+    await writeFile(receiptPath, malformed)
+
+    for (const extra of [[], ['--apply', approval]]) {
+      const result = run('rollback', 'codex', '--home', home, '--backup', backup, ...extra)
+
+      assert.equal(result.status, 1)
+
+      assert.equal(result.stdout, '')
+
+      assert.ok(!result.stderr.includes(privateText), 'Private receipt text appeared in stderr')
+
+      assert.match(result.stderr, /invalid.*private receipt/u)
+
+      assert.equal(await readFile(join(home, 'AGENTS.md'), 'utf8'), originalTarget)
+
+      assert.equal(await readFile(receiptPath, 'utf8'), malformed)
+    }
   }
 })

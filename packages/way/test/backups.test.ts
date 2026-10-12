@@ -152,7 +152,7 @@ await test('invalid and mismatched receipts fail without exposing their private 
 
   await truncate(path, 7_000_000)
 
-  await assert.rejects(listBackups('codex', home), /supported regular receipt/u)
+  await assert.rejects(listBackups('codex', home), /regular file within/u)
 })
 
 await test('symlinked and non-regular receipts are refused without reading the destination', async t => {
@@ -179,5 +179,5 @@ await test('symlinked and non-regular receipts are refused without reading the d
 
   await mkdir(path)
 
-  await assert.rejects(listBackups('codex', home), /supported regular receipt/u)
+  await assert.rejects(listBackups('codex', home), /regular file within/u)
 })

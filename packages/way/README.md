@@ -24,7 +24,9 @@ instructions, rejects symlinks and stale previews, and keeps versioned reference
 chosen agent home. Rollback refuses to overwrite later edits. Treat backup receipts as private:
 they contain your previous instruction file. Instructions must be valid UTF-8; a BOM and original
 line endings are preserved. Rollback validates receipt size, restored instruction size, timestamps,
-hashes, and ordinary file permission bits before writing.
+hashes, and ordinary file permission bits before writing. Invalid receipt diagnostics never include
+saved instruction text. Existing references must be regular files of the expected size; special
+files are refused without blocking setup.
 
 Use `way backups <agent>` to recover saved backup IDs without opening private receipts. It returns
 only each ID, creation time, and `canRollback` snapshot, newest first. A false value means the

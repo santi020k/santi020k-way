@@ -85,6 +85,27 @@ const decodeUtf8 = (bytes: Uint8Array): string => {
   }
 }
 
+const readReceipt = async (path: string, id: string): Promise<z.infer<typeof receiptSchema>> => {
+  await ensureSafePath(path)
+
+  const information = await lstat(path)
+
+  if (!information.isFile() || information.size > maximumReceiptBytes)
+    throw new Error('Backup receipt must be a regular file within the supported size.')
+
+  try {
+    const input: unknown = JSON.parse(decodeUtf8(await readFile(path)))
+    const receipt = receiptSchema.parse(input)
+
+    if (receipt.id !== id) throw new Error('Mismatched backup identity.')
+
+    return receipt
+  } catch {
+    // Parser diagnostics can quote private instruction text. Never forward them.
+    throw new Error(`Backup ${id} is invalid. Inspect its private receipt before retrying.`)
+  }
+}
+
 const readTarget = async (
   path: string
 ): Promise<{ content: string | null, mode: number }> => {
@@ -284,7 +305,14 @@ export const applySetup = async (
       ))
         throw error
 
-      if ((await readFile(path, 'utf8')) !== content)
+      const information = await lstat(path)
+
+      if (!information.isFile() || information.size !== Buffer.byteLength(content))
+        throw new Error(
+          'An immutable reference is not a regular file with the expected size. Restore it before updating.', { cause: error }
+        )
+
+      if (!(await readFile(path)).equals(Buffer.from(content)))
         throw new Error(
           'An immutable reference was modified. Restore it before updating.', { cause: error }
         )
@@ -338,18 +366,9 @@ export const planRollback = async (
 
   const home = resolve(directory)
   const receiptPath = join(home, 'way', 'backups', `${id}.json`)
+  const receipt = await readReceipt(receiptPath, id)
 
-  await ensureSafePath(receiptPath)
-
-  const receiptStat = await lstat(receiptPath)
-
-  if (!receiptStat.isFile() || receiptStat.size > maximumReceiptBytes)
-    throw new Error('Backup receipt must be a regular file within the supported size.')
-
-  const input: unknown = JSON.parse(decodeUtf8(await readFile(receiptPath)))
-  const receipt = receiptSchema.parse(input)
-
-  if (receipt.agent !== agent || receipt.id !== id)
+  if (receipt.agent !== agent)
     throw new Error('Backup does not match the requested agent.')
 
   const target = join(home, agent === 'codex' ? 'AGENTS.md' : 'CLAUDE.md')
@@ -398,6 +417,7 @@ export const listBackups = async (
     join(home, agent === 'codex' ? 'AGENTS.md' : 'CLAUDE.md')
   )
 
+  const currentHash = current.content === null ? null : digest(current.content)
   let files: string[]
 
   try {
@@ -417,33 +437,14 @@ export const listBackups = async (
 
     if (!z.uuid().safeParse(id).success) continue
 
-    const path = join(backups, file)
-
-    await ensureSafePath(path)
-
-    const information = await lstat(path)
-
-    if (!information.isFile() || information.size > maximumReceiptBytes)
-      throw new Error(`Backup ${id} is not a supported regular receipt file.`)
-
-    let receipt: z.infer<typeof receiptSchema>
-
-    try {
-      const input: unknown = JSON.parse(decodeUtf8(await readFile(path)))
-
-      receipt = receiptSchema.parse(input)
-
-      if (receipt.id !== id) throw new Error('Mismatched backup identity.')
-    } catch {
-      throw new Error(`Backup ${id} is invalid. Inspect its private receipt before retrying.`)
-    }
+    const receipt = await readReceipt(join(backups, file), id)
 
     if (receipt.agent !== agent) continue
 
     summaries.push({
       id,
       createdAt: receipt.createdAt,
-      canRollback: current.content !== null && digest(current.content) === receipt.afterHash
+      canRollback: currentHash === receipt.afterHash
     })
   }
 

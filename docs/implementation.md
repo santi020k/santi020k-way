@@ -43,7 +43,8 @@ Lumen and Theme sites. Keep 44px link targets, visible current-route cues, and r
 requires the matching preview hash. Changed instructions receive a private backup receipt;
 rollback is conditional on the current file still matching the installed version. An edited
 managed section is rejected, while personal text outside the section survives updates. Existing
-references are checked for modification, including during a no-op update. Symlink paths are
+references must be regular files of the expected byte size before content comparison, including
+during a no-op update. Pipes and other special files are rejected without blocking the installer. Symlink paths are
 refused and writes are serialized by a local lock. If a process is killed, inspect the directory
 and remove its stale `.way-setup.lock` only after confirming no installer remains running.
 Instruction replacement preserves the original file permissions even under a restrictive process
@@ -67,7 +68,9 @@ readable by updates and rollback. Invalid UTF-8 is rejected before instruction w
 non-ASCII text and existing line endings round-trip unchanged. Rollback accepts only regular,
 bounded receipt files with valid hashes, timestamps, ordinary permission bits and restored content
 within the instruction size limit. These checks validate receipt structure, not authenticity;
-backup receipts must remain private and trusted.
+backup receipts must remain private and trusted. Rollback and backup discovery share receipt
+validation and report malformed receipts without forwarding parser diagnostics that may contain
+private instruction text. Backup discovery hashes the current instructions once per listing.
 
 ## Tooling decisions
 

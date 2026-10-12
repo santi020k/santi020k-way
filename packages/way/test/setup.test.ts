@@ -1,4 +1,5 @@
 import assert from 'node:assert/strict'
+import { execFileSync, spawnSync } from 'node:child_process'
 import {
   chmod,
   mkdir,
@@ -8,11 +9,13 @@ import {
   rm,
   stat,
   symlink,
+  truncate,
   writeFile
 } from 'node:fs/promises'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import { test, type TestContext } from 'node:test'
+import { fileURLToPath } from 'node:url'
 
 import {
   applyRollback,
@@ -195,7 +198,7 @@ await test('no-op updates reject altered immutable references and restore missin
 
   const [path, content] = reference
 
-  await writeFile(path, 'Unexpected local change')
+  await writeFile(path, 'x'.repeat(Buffer.byteLength(content)))
 
   const next = await planSetup('codex', home)
 
@@ -404,4 +407,81 @@ await test('rollback refuses oversized and non-regular receipts', async t => {
   await assert.rejects(planRollback('codex', home, installed.backup), /regular file within/u)
 
   assert.equal(await readFile(setup.target, 'utf8'), setup.after)
+})
+
+await test('setup rejects a named pipe reference promptly and releases its lock', async t => {
+  const home = await fixture(t)
+  const plan = await planSetup('codex', home)
+
+  await applySetup('codex', home, plan.approval)
+
+  const reference = Object.entries(plan.references)[0]
+
+  assert.ok(reference)
+
+  const [path, content] = reference
+
+  await rm(path)
+
+  execFileSync('mkfifo', [path])
+
+  const next = await planSetup('codex', home)
+  const cli = fileURLToPath(new URL('../dist/cli.js', import.meta.url))
+
+  const result = spawnSync(process.execPath, [cli, 'setup', 'codex', '--home', home, '--apply', next.approval], {
+    encoding: 'utf8',
+    timeout: 3000
+  })
+
+  assert.equal(result.error, undefined, 'Setup hung while reading a non-regular reference')
+
+  assert.equal(result.status, 1)
+
+  assert.match(result.stderr, /immutable reference/u)
+
+  assert.equal(await readFile(plan.target, 'utf8'), plan.after)
+
+  await assert.rejects(stat(join(home, '.way-setup.lock')), { code: 'ENOENT' })
+
+  await rm(path)
+
+  assert.deepEqual(await applySetup('codex', home, next.approval), { changed: false })
+
+  assert.equal(await readFile(path, 'utf8'), content)
+})
+
+await test('setup refuses directory and oversized references without replacing instructions', async t => {
+  const home = await fixture(t)
+  const plan = await planSetup('codex', home)
+
+  await applySetup('codex', home, plan.approval)
+
+  const reference = Object.entries(plan.references)[0]
+
+  assert.ok(reference)
+
+  const [path, content] = reference
+  const next = await planSetup('codex', home)
+
+  await rm(path)
+
+  await mkdir(path)
+
+  await assert.rejects(applySetup('codex', home, next.approval), /immutable reference.*regular file/u)
+
+  assert.equal((await stat(path)).isDirectory(), true)
+
+  await rm(path, { recursive: true })
+
+  await writeFile(path, content)
+
+  await truncate(path, 16 * 1024 * 1024)
+
+  await assert.rejects(applySetup('codex', home, next.approval), /immutable reference.*expected size/u)
+
+  assert.equal((await stat(path)).size, 16 * 1024 * 1024)
+
+  assert.equal(await readFile(plan.target, 'utf8'), plan.after)
+
+  await assert.rejects(stat(join(home, '.way-setup.lock')), { code: 'ENOENT' })
 })
