@@ -3,7 +3,8 @@
 The user selected **0.1.0** as the first working release. The local integration branch is
 `release/v0.1.0`; `main` holds the preserved pre-implementation standards baseline. This plan
 prepares publication. The user authorized open-source publication and the initial deployment on
-2026-10-12. Production credential creation requires the separate, exact-target approval described below.
+2026-10-12. The user separately approved the production credential and reuse of the existing
+`github-actions-tooling` identity when the Infisical identity limit prevented a dedicated identity.
 
 ## Contents
 
@@ -58,13 +59,24 @@ The existing local `.infisical.json` is not exported or changed by this implemen
 The production target is Cloudflare account `5ca91d76ebcd9f998ab424010e0431c5`, zone
 `santi020k.com`, and Worker `santi020k-way`. Infisical project **The santi020k Way**
 (`85fb45bd-da04-4edb-a9f2-7c8d88c7f82a`) owns the deployment credential in `prod` at
-`/website/deploy`, named `CLOUDFLARE_API_TOKEN`. Its GitHub OIDC identity must trust only this
-repository's `production` environment on `main` and read only that deployment path. No secret
-values belong in GitHub repository files or variables. Infisical Secrets Action v1.0.18 supports
+`/website/deploy`, named `CLOUDFLARE_API_TOKEN`. The existing `github-actions-tooling` identity retains its existing OIDC trust for other consumers.
+Its Way project membership has the `no-access` role. A separate Way privilege grants only
+`describeSecret` and `readValue` for this key, environment and path, conditioned on secret metadata.
+Namespaced OIDC mappings `way_subject`, `way_ref` and `way_workflow` map `sub`, `ref` and
+`workflow_ref`. Metadata key `way_github_deployment` must equal their pipe-separated values:
+
+```text
+repo:santi020k@17752391/santi020k-way@1416127513:environment:production|refs/heads/main|santi020k/santi020k-way/.github/workflows/deploy-website.yml@refs/heads/main
+```
+
+This binds Way access to the immutable repository identity, protected production environment,
+main branch and deployment workflow. Missing or different claims do not match the metadata.
+No secret values belong in GitHub repository files or variables. Infisical Secrets Action v1.0.18 supports
 the workflow's `project-id` and single `secret-name` inputs; its reviewed commit is pinned.
 
-Credential bootstrap rollback is to revoke the new Cloudflare token and remove the new identity's
-project access. This stops future deployment access without changing any deployed assets. npm
+Credential bootstrap rollback is to revoke the Way Cloudflare token and remove only the Way
+privilege and Way project membership. Never delete the shared identity or change other consumers'
+OIDC trust. This stops future deployment access without changing any deployed assets. npm
 publication remains an optional separate workflow input; GitHub release archives work independently.
 
 The workflow records a build SHA in the site's `version.json`; post-deploy verification checks
