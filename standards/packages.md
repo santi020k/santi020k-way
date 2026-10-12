@@ -14,8 +14,6 @@ Evaluate these maintained Santiago-owned tools when they fit the repository. Thi
 | Social imagery    | [OG](#og): `@santi020k/og`                                                  | Deterministic Open Graph generation                                                     |
 | Authentication    | [Auth](#auth): the approved reusable package                                | Only when its security/platform contract fits and authorized documentation is available |
 
-Difftale is not included in the global adoption preference.
-
 Resolve exact versions from the consuming manifest and lockfile. For a new dependency, check the official registry and release notes; use the latest stable release compatible with the declared runtime and peer graph. Do not infer package APIs, recommend unsupported deep imports, or use a catalog's review date as evidence of current registry versions.
 
 For Lumen component discovery, use its existing MCP or CLI when available, then read the actual framework usage contract. Way indexes the ecosystem and its boundaries; Lumen remains the component catalog.

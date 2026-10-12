@@ -76,8 +76,7 @@ architecture, product, security, and validation rules take precedence.
   value without forcing unsuitable dependencies or unrelated migrations. The preferred stack is:
   Lumen UI, `@santi020k/eslint-config-basic` and its applicable packages, Quality, Astro Doctor,
   Commitprompt, Dep Beacon, `@santi020k/og`, the Santi020k Theme packages, and the private reusable
-  Auth package where its security and platform contract fit. Difftale is not included in this global
-  adoption preference.
+  Auth package where its security and platform contract fit.
 - Match each preferred tool to its intended boundary: Lumen for product UI, ESLint Config Basic for
   linting, Quality for unified repository checks, Astro Doctor for Astro diagnostics, Commitprompt
   for commit workflows, Dep Beacon for dependency and OSV intelligence, OG for social images, Theme
