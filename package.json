@@ -1,0 +1,24 @@
+{
+  "name": "@santi020k/way",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Reusable repository, release, quality, and contribution standards for santi020k projects.",
+  "license": "MIT",
+  "type": "module",
+  "scripts": {
+    "audit:pull-requests": "node scripts/audit-pr-title-workflows.mjs",
+    "audit:presentation": "node scripts/audit-repository-presentation.mjs",
+    "audit:quality": "node scripts/audit-quality-gates.mjs",
+    "audit:releases": "node scripts/audit-release-workflows.mjs",
+    "check": "node scripts/audit-release-workflows.mjs --check && node scripts/audit-repository-presentation.mjs --check && node scripts/audit-quality-gates.mjs && node scripts/audit-pr-title-workflows.mjs",
+    "commit": "commitprompt",
+    "hooks:install": "quality hooks install"
+  },
+  "engines": {
+    "node": ">=22.18.0"
+  },
+  "packageManager": "pnpm@10.34.3",
+  "devDependencies": {
+    "@santi020k/commitprompt": "^1.0.0"
+  }
+}

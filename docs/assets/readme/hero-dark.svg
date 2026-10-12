@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="360" viewBox="0 0 1200 360" role="img" aria-labelledby="readme-title readme-description">
+  <title id="readme-title">The santi020k Way — Clear repositories. Dependable delivery.</title>
+  <desc id="readme-description">Repositories · Quality · Releases. Decorative steps illustration in the project's existing palette.</desc>
+  <!-- README artwork. Palette and naming follow this repository's existing brand sources. -->
+  <rect x="1" y="1" width="1198" height="358" rx="22" fill="#110c1d" stroke="#945df4" stroke-opacity=".24"/>
+  <path d="M778 25V335" stroke="#945df4" stroke-opacity=".16"/>
+  <g fill="none" stroke="#945df4" stroke-opacity=".07"><circle cx="1025" cy="180" r="205"/><circle cx="1025" cy="180" r="238"/></g>
+
+  <g font-family="-apple-system,BlinkMacSystemFont,Segoe UI,Arial,sans-serif"><text x="48" y="56" font-size="13" font-weight="600" letter-spacing="2" fill="#945df4">REPOSITORIES · QUALITY · RELEASES</text><text x="48" y="148" font-size="62.0" font-weight="700" letter-spacing="-1.8" fill="#f8f6fd">The santi020k Way</text><text x="50" y="203" font-size="27" fill="#f8f6fd">Clear repositories.</text><text x="50" y="241" font-size="27" fill="#f8f6fd">Dependable delivery.</text><path d="M50 287H642" stroke="#945df4" stroke-opacity=".3"/><text x="50" y="320" font-family="ui-monospace,monospace" font-size="13" letter-spacing="1" fill="#945df4">santi020k / santi020k-way</text></g>
+  <g transform="translate(825 32)" stroke-linecap="round" stroke-linejoin="round"><path d="M70 55H230L150 145 230 235H70L150 145Z" fill="none" stroke="#945df4" stroke-width="2"/>
+<path d="M40 212L107 145 160 190 260 54" fill="none" stroke="#945df4" stroke-width="12"/>
+<circle cx="70" cy="55" r="9" fill="#110c1d" stroke="#945df4" stroke-width="3"/>
+<circle cx="230" cy="55" r="9" fill="#110c1d" stroke="#60c8e0" stroke-width="3"/>
+<circle cx="150" cy="145" r="13" fill="#945df4" stroke="#945df4" stroke-width="3"/>
+<circle cx="70" cy="235" r="9" fill="#110c1d" stroke="#60c8e0" stroke-width="3"/>
+<circle cx="230" cy="235" r="9" fill="#110c1d" stroke="#945df4" stroke-width="3"/></g>
+</svg>
