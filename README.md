@@ -31,6 +31,7 @@ pnpm install --frozen-lockfile
 pnpm build
 pnpm way list
 pnpm way search "design"
+pnpm way read packages
 pnpm dev
 ```
 
@@ -75,6 +76,7 @@ compatibility decisions and verification boundaries.
 
 ## Release resources
 
+- [Preferred tools and usage guides](standards/packages.md)
 - [Release standard](docs/release-standard.md)
 - [Repository presentation standard](docs/repository-presentation-standard.md)
 - [Professional library README template](templates/README-library.md)

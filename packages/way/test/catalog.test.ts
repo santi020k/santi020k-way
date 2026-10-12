@@ -43,3 +43,27 @@ await test('search retrieves the relevant standard without returning every full 
 
   assert.throws(() => searchStandards('x'.repeat(201)))
 })
+
+await test('tool names and aliases retrieve the package usage guide', () => {
+  for (const query of [
+    'Lumen',
+    'Theme',
+    'ESLint Config Basic',
+    'Quality',
+    'Astro Doctor',
+    'astro-doctor',
+    'Commitprompt',
+    'Dep Beacon',
+    'dep-beacon',
+    'OG',
+    'Open Graph',
+    'santi-og',
+    'Auth'
+  ]) {
+    const match = searchStandards(query).find(entry => entry.id === 'packages')
+
+    assert.ok(match, `Missing tool usage guide for ${query}`)
+
+    assert.equal(getStandard(match.id).source, 'standards/packages.md')
+  }
+})

@@ -35,7 +35,7 @@
   {
     "id": "packages",
     "title": "Preferred tools and package boundaries",
-    "summary": "Choose maintained Santiago-owned tools that fit the project.",
+    "summary": "Choose Santiago-owned tools with practical setup, examples, verification, and scoped exceptions.",
     "kind": "standard",
     "source": "standards/packages.md",
     "tags": [
@@ -44,7 +44,16 @@
       "theme",
       "quality",
       "eslint",
+      "eslint config basic",
       "astro",
+      "astro doctor",
+      "astro-doctor",
+      "commitprompt",
+      "dep beacon",
+      "dep-beacon",
+      "og",
+      "open graph",
+      "santi-og",
       "auth"
     ],
     "scope": "Santiago-owned projects; project-specific instructions take precedence",
