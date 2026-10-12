@@ -1,5 +1,6 @@
 import assert from 'node:assert/strict'
 import {
+  chmod,
   mkdtemp,
   readFile,
   realpath,
@@ -219,4 +220,81 @@ await test('relative homes and concurrent installer locks are rejected', async t
   await assert.rejects(applySetup('codex', home, plan.approval), { code: 'EEXIST' })
 
   await assert.rejects(stat(plan.target), { code: 'ENOENT' })
+})
+
+await test('setup refuses growth beyond the instruction size limit before writing', async t => {
+  const home = await fixture(t)
+  const target = join(home, 'AGENTS.md')
+  const original = 'é'.repeat(524_288)
+
+  await writeFile(target, original)
+
+  await assert.rejects(planSetup('codex', home), /proposed instructions exceed/u)
+
+  await assert.rejects(applySetup('codex', home, 'invalid'), /proposed instructions exceed/u)
+
+  assert.equal(await readFile(target, 'utf8'), original)
+
+  await assert.rejects(stat(join(home, 'way')), { code: 'ENOENT' })
+
+  await assert.rejects(stat(join(home, '.way-setup.lock')), { code: 'ENOENT' })
+
+  await rm(target)
+
+  const empty = await planSetup('codex', home)
+  const fitting = 'x'.repeat(1_048_576 - Buffer.byteLength(empty.after ?? '') - 2)
+
+  await writeFile(target, fitting)
+
+  const boundary = await planSetup('codex', home)
+
+  assert.equal(Buffer.byteLength(boundary.after ?? ''), 1_048_576)
+
+  const installed = await applySetup('codex', home, boundary.approval)
+
+  assert.ok(installed.backup)
+
+  assert.equal((await planSetup('codex', home)).changed, false)
+
+  const rollback = await planRollback('codex', home, installed.backup)
+
+  await applyRollback('codex', home, installed.backup, rollback.approval)
+
+  assert.equal(await readFile(target, 'utf8'), fitting)
+})
+
+await test('installation and rollback preserve permissions under a restrictive umask', async t => {
+  const home = await fixture(t)
+  const target = join(home, 'AGENTS.md')
+  const original = 'Personal guidance.\n'
+
+  await writeFile(target, original)
+
+  await chmod(target, 0o660)
+
+  const previousMask = process.umask(0o077)
+
+  try {
+    const plan = await planSetup('codex', home)
+    const installed = await applySetup('codex', home, plan.approval)
+
+    assert.ok(installed.backup)
+
+    assert.equal((await stat(target)).mode & 0o777, 0o660)
+
+    // The backup's original mode also survives rollback after a permission change.
+    await chmod(target, 0o600)
+
+    const rollback = await planRollback('codex', home, installed.backup)
+
+    await applyRollback('codex', home, installed.backup, rollback.approval)
+
+    assert.equal((await stat(target)).mode & 0o777, 0o660)
+
+    assert.equal(await readFile(target, 'utf8'), original)
+
+    assert.equal((await stat(join(home, 'way', 'backups', `${installed.backup}.json`))).mode & 0o777, 0o600)
+  } finally {
+    process.umask(previousMask)
+  }
 })

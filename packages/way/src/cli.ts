@@ -41,7 +41,7 @@ const main = async (): Promise<void> => {
   if (
     command !== 'setup' &&
     command !== 'rollback' &&
-    (values.home || values.apply || values.backup)
+    (values.home !== undefined || values.apply !== undefined || values.backup !== undefined)
   )
     throw new Error('Setup options only apply to setup or rollback.')
 
@@ -50,6 +50,9 @@ const main = async (): Promise<void> => {
 
   if (positionals.length > 2)
     throw new Error('Unexpected arguments. Quote multi-word search queries.')
+
+  if (values.apply === '')
+    throw new Error('--apply requires a non-empty preview hash.')
 
   if (command === 'mcp') {
     const { runMcp } = await import('./mcp.js')
@@ -71,13 +74,17 @@ const main = async (): Promise<void> => {
     return
   }
 
-  if (command === 'search' && argument) {
+  if (command === 'search') {
+    if (!argument) throw new Error('Search requires a query. Run way search <query>.')
+
     print(searchStandards(argument))
 
     return
   }
 
-  if (command === 'read' && argument) {
+  if (command === 'read') {
+    if (!argument) throw new Error('Read requires a standard ID. Run way read <id>.')
+
     console.log(getStandard(argument).content)
 
     return
@@ -97,7 +104,7 @@ const main = async (): Promise<void> => {
       join(homedir(), argument === 'codex' ? '.codex' : '.claude')
 
   if (command === 'setup') {
-    if (values.backup) throw new Error('--backup only applies to rollback.')
+    if (values.backup !== undefined) throw new Error('--backup only applies to rollback.')
 
     if (values.apply) print(await applySetup(argument, home, values.apply))
     else {

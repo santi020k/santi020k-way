@@ -3,6 +3,8 @@ import assert from 'node:assert/strict'
 import { AxeBuilder } from '@axe-core/playwright'
 import { expect, test } from '@playwright/test'
 
+import { readCatalog } from '../packages/way/dist/catalog.js'
+
 for (const route of ['/', '/standards/', '/start/', '/architecture/', '/standards/design/']) {
   test(`${route} is accessible and fits the viewport`, async ({ page }, testInfo) => {
     const errors: string[] = []
@@ -44,7 +46,7 @@ test('search has results, an empty state, and reset', async ({ page }) => {
 
   await search.fill('')
 
-  await expect(page.locator('[data-search]:visible')).toHaveCount(12)
+  await expect(page.locator('[data-search]:visible')).toHaveCount(readCatalog().entries.length)
 })
 
 test('theme and keyboard code tabs remain usable', async ({ page }) => {
