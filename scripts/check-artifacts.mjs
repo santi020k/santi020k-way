@@ -26,9 +26,36 @@ const sandbox = await mkdtemp(join(tmpdir(), 'way-artifacts-'))
 
 try {
   for (const host of ['codex', 'claude']) {
+    const marketplaceDirectory = join(sandbox, host)
     const plugin = join(sandbox, host, 'santi020k-way')
 
-    await cp(join(root, 'packages/plugin/dist', host, 'santi020k-way'), plugin, { recursive: true })
+    await cp(join(root, 'packages/plugin/dist', host), marketplaceDirectory, { recursive: true })
+
+    const marketplace = JSON.parse(await readFile(join(marketplaceDirectory, host === 'claude' ? '.claude-plugin/marketplace.json' : '.agents/plugins/marketplace.json'), 'utf8'))
+
+    assert.equal(marketplace.name, 'santi020k-way')
+
+    assert.equal(marketplace.plugins.length, 1)
+
+    const listing = marketplace.plugins[0]
+
+    assert.equal(listing.name, 'santi020k-way')
+
+    if (host === 'claude') {
+      assert.deepEqual(marketplace.owner, pkg.author)
+
+      assert.equal(marketplace.metadata.description, pkg.description)
+
+      assert.equal(listing.source, './santi020k-way')
+
+      assert.equal(listing.description, pkg.description)
+    } else {
+      assert.equal(marketplace.interface.displayName, 'The santi020k Way')
+
+      assert.deepEqual(listing.source, { source: 'local', path: './santi020k-way' })
+
+      assert.deepEqual(listing.policy, { installation: 'AVAILABLE', authentication: 'ON_INSTALL' })
+    }
 
     const manifest = JSON.parse(await readFile(join(plugin, 'plugin.json'), 'utf8'))
 

@@ -38,32 +38,6 @@ if (refs) {
     throw new Error('This version already belongs to a different commit.')
 }
 
-if (process.env.WAY_PUBLISH_NPM === 'true') {
-  const response = await fetch(
-    `https://registry.npmjs.org/@santi020k%2fway/${pkg.version}`
-  )
-
-  if (response.ok) {
-    const metadata = await response.json()
-
-    if (metadata.gitHead !== commit)
-      throw new Error(
-        'Existing npm version has different or missing source provenance.'
-      )
-
-    console.log('Matching npm version already exists; leaving it unchanged.')
-  } else if (response.status === 404) {
-    execFileSync('npm', ['publish', '--provenance', '--access', 'public'], {
-      cwd: 'packages/way',
-      stdio: 'inherit'
-    })
-  } else {
-    throw new Error(
-      `Cannot verify npm release state (HTTP ${response.status}).`
-    )
-  }
-}
-
 const existing = await fetch(
   `https://api.github.com/repos/${process.env.GITHUB_REPOSITORY}/releases/tags/${tag}`, {
     headers: {
@@ -119,7 +93,39 @@ if (existing.ok) {
   verifyReleaseAssets(release.assets, local, remote)
 
   console.log('Matching GitHub release and archive payloads verified; no assets replaced.')
-} else if (existing.status === 404) {
+} else if (existing.status !== 404) {
+  throw new Error(
+    `Cannot verify GitHub release state (HTTP ${existing.status}).`
+  )
+}
+
+if (process.env.WAY_PUBLISH_NPM === 'true') {
+  const response = await fetch(
+    `https://registry.npmjs.org/@santi020k%2fway/${pkg.version}`
+  )
+
+  if (response.ok) {
+    const metadata = await response.json()
+
+    if (metadata.gitHead !== commit)
+      throw new Error(
+        'Existing npm version has different or missing source provenance.'
+      )
+
+    console.log('Matching npm version already exists; leaving it unchanged.')
+  } else if (response.status === 404) {
+    execFileSync('npm', ['publish', '--provenance', '--access', 'public'], {
+      cwd: 'packages/way',
+      stdio: 'inherit'
+    })
+  } else {
+    throw new Error(
+      `Cannot verify npm release state (HTTP ${response.status}).`
+    )
+  }
+}
+
+if (existing.status === 404) {
   execFileSync(
     'gh', [
       'release',
@@ -136,10 +142,6 @@ if (existing.ok) {
       `dist/santi020k-way-${pkg.version}.tgz`,
       'dist/SHA256SUMS'
     ], { stdio: 'inherit' }
-  )
-} else {
-  throw new Error(
-    `Cannot verify GitHub release state (HTTP ${existing.status}).`
   )
 }
 

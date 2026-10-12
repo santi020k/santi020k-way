@@ -1,25 +1,46 @@
 import assert from 'node:assert/strict'
-import { execFileSync } from 'node:child_process'
-import { access, mkdir, readFile, writeFile } from 'node:fs/promises'
+import { mkdir, mkdtemp, readdir, readFile, rm, writeFile } from 'node:fs/promises'
+import { tmpdir } from 'node:os'
+import { join } from 'node:path'
 import { test } from 'node:test'
-import { fileURLToPath } from 'node:url'
+import { pathToFileURL } from 'node:url'
 
-test('website generation removes obsolete downloads and standards sources', async () => {
-  const root = new URL('../../', import.meta.url)
-  const outputs = ['downloads', 'sources'].map(folder => new URL(`apps/website/public/${folder}/`, root))
+import { buildWebsiteSources } from './website-sources.mjs'
 
-  for (const folder of outputs) {
-    await mkdir(folder, { recursive: true })
+test('website regeneration removes retired sources and templates while preserving static assets', async t => {
+  const directory = await mkdtemp(join(tmpdir(), 'way-website-sources-'))
 
-    await writeFile(new URL('obsolete-way-regression.txt', folder), 'removed canonical input')
+  t.after(() => rm(directory, { recursive: true, force: true }))
+
+  const root = pathToFileURL(`${directory}/`)
+  const templates = new URL('templates/', root)
+  const publicRoot = new URL('apps/website/public/', root)
+
+  await mkdir(templates, { recursive: true })
+
+  await mkdir(publicRoot, { recursive: true })
+
+  await writeFile(new URL('favicon.svg', publicRoot), 'static asset')
+
+  await writeFile(new URL('old.md', templates), 'old template')
+
+  await buildWebsiteSources(root, [{ id: 'retired', content: 'old guidance' }])
+
+  await rm(new URL('old.md', templates))
+
+  await writeFile(new URL('current.md', templates), 'current template')
+
+  for (let run = 0; run < 2; run++) {
+    await buildWebsiteSources(root, [{ id: 'current', content: 'current guidance' }])
+
+    assert.deepEqual(await readdir(new URL('sources/', publicRoot)), ['current.md'])
+
+    assert.deepEqual(await readdir(new URL('downloads/', publicRoot)), ['current.md'])
+
+    assert.equal(await readFile(new URL('sources/current.md', publicRoot), 'utf8'), 'current guidance')
+
+    assert.equal(await readFile(new URL('downloads/current.md', publicRoot), 'utf8'), 'current template')
+
+    assert.equal(await readFile(new URL('favicon.svg', publicRoot), 'utf8'), 'static asset')
   }
-
-  execFileSync(process.execPath, [fileURLToPath(new URL('scripts/build-website-sources.mjs', root))])
-
-  for (const folder of outputs)
-    await assert.rejects(access(new URL('obsolete-way-regression.txt', folder)), { code: 'ENOENT' })
-
-  const template = await readFile(new URL('templates/README-library.md', root), 'utf8')
-
-  assert.equal(await readFile(new URL('README-library.md', outputs[0]), 'utf8'), template)
 })

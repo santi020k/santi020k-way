@@ -23,6 +23,8 @@ provenance, architecture decisions, installation examples, light/dark themes and
 metadata for `https://way.santi020k.com`. No catalog service, database, tracking or credentials are
 needed to run it. Documentation templates are served as downloads rather than broken repository
 relative links.
+Source and download directories are regenerated from scratch so retired catalog entries and
+templates are removed on incremental builds; other public assets remain intact.
 
 The shared header and footer own site navigation through `apps/website/src/lib/navigation.ts`.
 The compact header stays available while reading; mobile navigation uses Lumen's native dialog
@@ -40,6 +42,8 @@ managed section is rejected, while personal text outside the section survives up
 references are checked for modification, including during a no-op update. Symlink paths are
 refused and writes are serialized by a local lock. If a process is killed, inspect the directory
 and remove its stale `.way-setup.lock` only after confirming no installer remains running.
+Instruction replacement preserves the original file permissions even under a restrictive process
+umask; backup receipts and new references remain private.
 
 First installation preserves existing guidance, including its size. Santiago's captured global
 file exceeds the default Codex 32 KiB combined instruction budget. Review and manually retire
@@ -47,6 +51,9 @@ superseded personal text after making a backup; the installer never silently rem
 Runtime settings are deliberately separate. `config/` contains optional MCP-only examples;
 merge the relevant section manually, or install the plugin that supplies it. Use only one MCP
 registration per host. No real agent home is modified by repository validation.
+Both existing and proposed instruction files must fit the supported 1 MiB limit. Setup rejects an
+oversized proposal during preview, before creating references or backups, so installed files remain
+readable by updates and rollback.
 
 ## Tooling decisions
 
@@ -72,7 +79,8 @@ type-check gate. `pnpm verify` adds browser tests and versioned release archives
 pre-push and GitHub Actions completion gate. `pnpm test:browser` covers representative routes,
 WCAG checks, responsive overflow, search, theme persistence, keyboard tabs, mobile navigation,
 focus return, no-JavaScript navigation, and footer links. Generated plugin
-MCP servers are exercised from isolated directories without repository dependencies. For host
+MCP servers are exercised from isolated directories without repository dependencies.
+Marketplace manifests are checked alongside their plugin listings and source paths. For host
 validation, run `claude plugin validate` on the Claude package and marketplace; Codex can install
 the generated marketplace into a temporary profile. `pnpm audit:all` remains an optional sibling
 repository audit and is independent of Way's completion gate.

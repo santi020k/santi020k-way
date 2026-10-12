@@ -6,6 +6,7 @@
     "skills/**",
     "templates/**",
     "scripts/build-*.mjs",
+    "scripts/lib/website-sources.mjs",
     "scripts/finalize-cli.mjs"
   ],
   "tasks": {
