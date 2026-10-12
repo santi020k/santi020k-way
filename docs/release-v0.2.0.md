@@ -2,11 +2,15 @@
 
 The user selected **0.2.0** for continued reliability work on 2026-10-12. The local integration
 branch is `release/v0.2.0`, based on the fetched `main` commit `d99b14d`. It carries forward the
-committed hardening from `82950d0`; the separate unfinished v0.1.1 worktree is preserved.
+committed hardening from `82950d0`. The former v0.1.1 preparation was repurposed into the
+backup-discovery feature branch without publishing a patch release.
 Publishing and deployment require separate authorization.
 
 ## Contents
 
+- Add read-only `way backups <codex|claude>` to discover private receipt IDs, creation times and
+  current rollback availability. Listing validates receipts without returning saved instruction text
+  and keeps fresh rollback preview and approval mandatory.
 - Preserve valid UTF-8 instruction bytes, including BOMs and non-ASCII guidance; refuse invalid
   encoding before setup can replace personal content.
 - Validate rollback receipt type, size, hash, timestamp, restored instruction size and permission
@@ -33,9 +37,9 @@ runtime settings are modified by repository validation.
 ## Validation and release
 
 Run `pnpm install --frozen-lockfile` and `pnpm verify`, which includes policy, lint, types, tests,
-builds, artifact checks, formatting, browser behavior and release packaging. Add a minor Changeset
-for `@santi020k/way` and run `pnpm changeset version`; generated plugin/site versions derive from
-that package. Review the full diff against `main` independently before an authorized first push.
+builds, artifact checks, formatting, browser behavior and release packaging. The minor Changeset
+was applied for `@santi020k/way`; backup discovery is included in the same 0.2.0 changelog entry.
+Generated plugin/site versions derive from that package. Review the full diff against `main` independently before an authorized first push.
 Use a release PR into `main`, inspect all review feedback and required checks, then use the
 GitHub Release workflow from the merged commit. Do not publish locally.
 

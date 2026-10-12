@@ -4,6 +4,8 @@
 
 ### Minor Changes
 
+- Add read-only `way backups <codex|claude>` to discover saved rollback IDs, timestamps, and current rollback availability without exposing private instruction content. Listing uses the same strict receipt validation as rollback and preserves later personal edits.
+
 - Harden local instruction setup and rollback with strict UTF-8 preservation and bounded receipt validation. Validate catalog metadata and SHA-256 integrity in builds and runtime reads, and reject empty arguments on no-argument CLI commands. Browser verification now requires a fresh preview server and checks its rendered version.
 
 ## 0.1.0

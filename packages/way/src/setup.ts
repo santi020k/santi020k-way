@@ -22,6 +22,8 @@ export type Agent = 'codex' | 'claude'
 const start = '<!-- santi020k-way:start -->'
 const end = '<!-- santi020k-way:end -->'
 const maximumInstructionBytes = 1_048_576
+// JSON can escape each original byte into six ASCII bytes, plus receipt metadata.
+const maximumReceiptBytes = maximumInstructionBytes * 6 + 4096
 const digest = (value: string) => createHash('sha256').update(value).digest('hex')
 
 const receiptSchema = z.object({
@@ -341,8 +343,7 @@ export const planRollback = async (
 
   const receiptStat = await lstat(receiptPath)
 
-  // JSON can escape each original byte into six ASCII bytes, plus receipt metadata.
-  if (!receiptStat.isFile() || receiptStat.size > maximumInstructionBytes * 6 + 4096)
+  if (!receiptStat.isFile() || receiptStat.size > maximumReceiptBytes)
     throw new Error('Backup receipt must be a regular file within the supported size.')
 
   const input: unknown = JSON.parse(decodeUtf8(await readFile(receiptPath)))
@@ -422,18 +423,15 @@ export const listBackups = async (
 
     const information = await lstat(path)
 
-    // JSON can encode each original byte as a six-byte Unicode escape.
-    if (!information.isFile() || information.size > maximumInstructionBytes * 6 + 1024)
+    if (!information.isFile() || information.size > maximumReceiptBytes)
       throw new Error(`Backup ${id} is not a supported regular receipt file.`)
 
     let receipt: z.infer<typeof receiptSchema>
 
     try {
-      const input: unknown = JSON.parse(await readFile(path, 'utf8'))
+      const input: unknown = JSON.parse(decodeUtf8(await readFile(path)))
 
       receipt = receiptSchema.parse(input)
-
-      z.iso.datetime().parse(receipt.createdAt)
 
       if (receipt.id !== id) throw new Error('Mismatched backup identity.')
     } catch {

@@ -120,7 +120,9 @@ await test('invalid and mismatched receipts fail without exposing their private 
   for (const text of [
     'Private malformed content',
     JSON.stringify({ ...receipt, id: randomUUID() }),
-    JSON.stringify({ ...receipt, createdAt: 'invalid' })
+    JSON.stringify({ ...receipt, createdAt: 'invalid' }),
+    JSON.stringify({ ...receipt, afterHash: 'invalid' }),
+    JSON.stringify({ ...receipt, mode: -1 })
   ]) {
     await writeFile(path, text)
 
@@ -130,6 +132,21 @@ await test('invalid and mismatched receipts fail without exposing their private 
 
     assert.equal(await readFile(path, 'utf8'), text)
   }
+
+  const invalidUtf8 = Buffer.from(JSON.stringify({ ...receipt, before: 'private' }))
+  const privateOffset = invalidUtf8.indexOf('private')
+
+  assert.ok(privateOffset >= 0)
+
+  invalidUtf8[privateOffset] = 0xff
+
+  await writeFile(path, invalidUtf8)
+
+  await assert.rejects(listBackups('codex', home), {
+    message: `Backup ${installed.backup} is invalid. Inspect its private receipt before retrying.`
+  })
+
+  assert.deepEqual(await readFile(path), invalidUtf8)
 
   await writeFile(path, original)
 
