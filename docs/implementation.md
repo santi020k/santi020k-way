@@ -24,6 +24,13 @@ metadata for `https://way.santi020k.com`. No catalog service, database, tracking
 needed to run it. Documentation templates are served as downloads rather than broken repository
 relative links.
 
+The shared header and footer own site navigation through `apps/website/src/lib/navigation.ts`.
+The compact header stays available while reading; mobile navigation uses Lumen's native dialog
+and focus handling, with ordinary links retained before enhancement or when JavaScript is off.
+The site adds background scroll locking and closes the mobile dialog when crossing into the
+desktop layout. Footer groups expose the main routes, design and library guides, and the owned
+Lumen and Theme sites. Keep 44px link targets, visible current-route cues, and reduced motion.
+
 ## Global configuration ownership
 
 `way setup` previews a small managed instruction section and hashed local references. `--apply`
@@ -61,7 +68,8 @@ consumers; this static documentation site has no auth or dependency-monitoring s
 
 `pnpm check` runs lint, type checks, behavioral tests, builds, and artifact checks.
 `pnpm format:check` checks non-code formatting. `pnpm test:browser` covers representative routes,
-WCAG checks, responsive overflow, search, theme persistence and keyboard tabs. Generated plugin
+WCAG checks, responsive overflow, search, theme persistence, keyboard tabs, mobile navigation,
+focus return, no-JavaScript navigation, and footer links. Generated plugin
 MCP servers are exercised from isolated directories without repository dependencies. For host
 validation, run `claude plugin validate` on the Claude package and marketplace; Codex can install
 the generated marketplace into a temporary profile. `pnpm audit:all` remains an optional sibling

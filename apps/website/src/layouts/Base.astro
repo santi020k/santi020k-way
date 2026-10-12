@@ -3,10 +3,12 @@ import '@santi020k/lumen-astro/styles.css'
 import '@santi020k/theme/site.css'
 import '@santi020k/theme/typography.css'
 import '../styles/site.css'
+import '../styles/navigation.css'
 
-import { Icon, ThemeToggle } from '@santi020k/lumen-astro'
 import UIPrimitives from '@santi020k/lumen-astro/runtime'
-import { readCatalog } from '@santi020k/way/catalog'
+
+import SiteFooter from '../components/SiteFooter.astro'
+import SiteHeader from '../components/SiteHeader.astro'
 
 interface Props {
   title: string
@@ -15,7 +17,6 @@ interface Props {
 
 const { title, description } = Astro.props
 const canonical = new URL(Astro.url.pathname, Astro.site)
-const active = Astro.url.pathname
 ---
 
 <!doctype html>
@@ -35,64 +36,15 @@ const active = Astro.url.pathname
     <meta property="og:url" content={canonical} />
     <script is:inline src="/theme.js"></script>
   </head>
-  <body>
+  <body id="top">
     <a class="skip-link" href="#main">
       Skip to content
     </a>
-    <header class="site-header shell">
-      <a class="wordmark" href="/" aria-label="The santi020k Way home">
-        <span class="brand-mark" aria-hidden="true">
-          &gt;_
-        </span>
-        <span>
-          santi020k<span class="wordmark-way"> / way</span>
-        </span>
-      </a>
-      <nav aria-label="Main navigation">
-        <a
-          href="/standards/"
-          aria-current={active.startsWith('/standards') ? 'page' : undefined}
-        >
-          Standards
-        </a>
-        <a
-          href="/architecture/"
-          aria-current={active === '/architecture/' ? 'page' : undefined}
-        >
-          Architecture
-        </a>
-        <a
-          href="/start/"
-          aria-current={active === '/start/' ? 'page' : undefined}
-        >
-          Get started <Icon name="arrow-up-right" aria-hidden="true" />
-        </a>
-      </nav>
-      <ThemeToggle storageKey="way-theme" aria-label="Toggle color theme" />
-    </header>
+    <SiteHeader />
     <main id="main" class="shell" tabindex="-1">
       <slot />
     </main>
-    <footer class="site-footer shell">
-      <div>
-        <a class="footer-brand" href="/">
-          The santi020k Way
-        </a>
-        <p>Clear decisions. Considered design. Dependable delivery.</p>
-      </div>
-      <div class="footer-links">
-        <a href="/standards/">Read the standards</a>
-        <a
-          href="https://santi020k.com"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Made by Santiago Molina{' '}
-          <Icon name="arrow-up-right" aria-hidden="true" />
-        </a>
-      </div>
-      <p class="footer-note">Open conventions · Local-first tools · v{readCatalog().version}</p>
-    </footer>
+    <SiteFooter />
     <UIPrimitives />
   </body>
 </html>
