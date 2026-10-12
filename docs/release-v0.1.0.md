@@ -35,6 +35,9 @@ configuring npm Trusted Publishing for this repository's `release.yml` workflow 
 environment. The initial npm package may require an explicitly authorized one-time bootstrap;
 never substitute a long-lived token or local publication silently. Verify repository metadata
 before publication. Retries must verify existing tags and npm `gitHead`, never replace versions.
+GitHub release state and any existing archive payloads are verified before optional npm
+publication. Incomplete releases, conflicting payloads, and provider verification failures stop
+the workflow before a new npm version is published.
 
 For later releases, add a Changeset for `@santi020k/way`, run `pnpm changeset version` on the selected
 `release/v<semver>`, and commit the version/changelog/lockfile together. Plugin and website display
@@ -90,3 +93,10 @@ release. For local instruction changes, preview and apply `way rollback` using t
 ID; later personal edits intentionally block rollback. For a website regression, revert the
 source change through a reviewed PR and run the deployment workflow from the resulting main
 commit. Keep the previous successful artifact/deployment available until public smoke checks pass.
+
+GitHub and npm publication are separate operations, not an atomic transaction. If optional npm
+publication succeeds but GitHub release creation fails, inspect both providers and rerun Release
+from the same main commit with the same npm input. Matching npm `gitHead` makes the retry skip npm
+publication and finish the missing GitHub release. A failed npm command stops before GitHub
+creation. Do not change the version or replace a published artifact to recover a transient command
+failure; conflicting provenance or incomplete existing GitHub assets require investigation instead.
