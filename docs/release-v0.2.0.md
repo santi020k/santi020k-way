@@ -4,10 +4,12 @@ The user selected **0.2.0** for continued reliability work on 2026-10-12. The lo
 branch is `release/v0.2.0`, based on the fetched `main` commit `d99b14d`. It carries forward the
 committed hardening from `82950d0`. The former v0.1.1 preparation was repurposed into the
 backup-discovery feature branch without publishing a patch release.
-Publishing and deployment require separate authorization.
+The user authorized the release push, reviewed PR integration, GitHub publication and website
+deployment on 2026-10-12. npm publication remains disabled until its publisher is configured.
 
 ## Contents
 
+- Remove references to the retired Difftale project from maintained guidance and the sibling inventory.
 - Add read-only `way backups <codex|claude>` to discover private receipt IDs, creation times and
   current rollback availability. Listing validates receipts without returning saved instruction text
   and keeps fresh rollback preview and approval mandatory.
