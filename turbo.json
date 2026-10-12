@@ -4,6 +4,7 @@
     "standards/**",
     "docs/**",
     "skills/**",
+    "templates/**",
     "scripts/build-*.mjs",
     "scripts/finalize-cli.mjs"
   ],

@@ -1,6 +1,8 @@
 import { execFileSync } from 'node:child_process'
 import { readFile } from 'node:fs/promises'
 
+import { verifyReleaseAssets } from './lib/release-assets.mjs'
+
 if (
   process.env.GITHUB_ACTIONS !== 'true' ||
   process.env.GITHUB_REF !== 'refs/heads/main'
@@ -94,9 +96,29 @@ if (existing.ok) {
     )
   }
 
-  console.log(
-    'Matching GitHub release exists; no tag or assets will be replaced.'
-  )
+  const local = new Map()
+  const remote = new Map()
+
+  for (const name of expected) {
+    const asset = release.assets.find(item => item.name === name)
+
+    const response = await fetch(
+      `https://api.github.com/repos/${process.env.GITHUB_REPOSITORY}/releases/assets/${asset.id}`, {
+        headers: { Authorization: `Bearer ${process.env.GH_TOKEN}`, Accept: 'application/octet-stream' },
+        signal: AbortSignal.timeout(30000)
+      }
+    )
+
+    if (!response.ok) throw new Error(`Cannot download release asset ${name} (HTTP ${response.status}).`)
+
+    remote.set(name, Buffer.from(await response.arrayBuffer()))
+
+    local.set(name, await readFile(`dist/${name}`))
+  }
+
+  verifyReleaseAssets(release.assets, local, remote)
+
+  console.log('Matching GitHub release and archive payloads verified; no assets replaced.')
 } else if (existing.status === 404) {
   execFileSync(
     'gh', [

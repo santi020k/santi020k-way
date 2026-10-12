@@ -51,6 +51,10 @@ try {
 
       assert.ok(hostManifest.interface.shortDescription.length <= 30)
 
+      assert.ok(Array.isArray(hostManifest.interface.defaultPrompt) && hostManifest.interface.defaultPrompt.length > 0)
+
+      assert.ok(hostManifest.interface.defaultPrompt.every(prompt => typeof prompt === 'string' && prompt.trim().length > 0))
+
       assert.ok(Array.isArray(hostManifest.interface.capabilities) && hostManifest.interface.capabilities.length > 0)
     }
 

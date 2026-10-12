@@ -84,7 +84,8 @@ for (const host of ['codex', 'claude']) {
           developerName: 'Santiago Molina',
           category: 'Developer Tools',
           capabilities: ['Read engineering standards', 'Apply reusable workflows'],
-          websiteURL: pkg.homepage
+          websiteURL: pkg.homepage,
+          defaultPrompt: ['Use the santi020k Way to review this repository and recommend applicable standards.']
         } } :
         {})
     }
