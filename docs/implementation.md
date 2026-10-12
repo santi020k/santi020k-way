@@ -110,6 +110,8 @@ repository audit and is independent of Way's completion gate.
 The presentation audit checks source package manifests under `packages/`, excluding installed
 dependencies, build output, caches, Git metadata and fixtures, as the package-policy audit does.
 Generated copies cannot introduce duplicate findings or replace source metadata checks.
+The release audit matches complete `version:` or `version-script:` keys; Node runtime settings
+and commented-out commands do not satisfy the version-command safeguard.
 
 ## Hook and delivery ownership
 

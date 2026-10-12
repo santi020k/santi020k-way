@@ -9,6 +9,8 @@
 - Clarify the website architecture with a responsive guidance flow, ownership boundaries, decision links, and keyboard and enlarged-text verification.
 
 - Add a way-of-working guide to the shared catalog, with practical code and workflow examples, a reading map, and clear implementation and delivery expectations.
+- Require exact version-command keys in release-workflow audits so Node runtime settings and commented commands cannot conceal a missing Changesets version command.
+
 - Keep malformed rollback receipt contents out of error output. Share receipt validation with backup discovery, hash current instructions once per listing, and reject non-regular or incorrectly sized immutable references before reading them.
 
 - Remove references to the retired Difftale project from the shared package guidance and repository inventory.

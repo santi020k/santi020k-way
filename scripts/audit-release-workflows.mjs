@@ -70,10 +70,7 @@ const getChangesetsIssues = (workflows, documentedGitHubToken) => {
     issues.push('release PR permission')
   }
 
-  if (
-    !combinedChangesetsWorkflows.includes('version:') &&
-    !combinedChangesetsWorkflows.includes('version-script:')
-  ) {
+  if (!/^\s*(?:version|version-script):/mu.test(combinedChangesetsWorkflows)) {
     issues.push('version command')
   }
 
