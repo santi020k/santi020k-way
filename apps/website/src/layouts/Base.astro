@@ -1,0 +1,50 @@
+---
+import '@santi020k/lumen-astro/styles.css'
+import '@santi020k/theme/site.css'
+import '@santi020k/theme/typography.css'
+import '../styles/site.css'
+import '../styles/navigation.css'
+
+import UIPrimitives from '@santi020k/lumen-astro/runtime'
+
+import SiteFooter from '../components/SiteFooter.astro'
+import SiteHeader from '../components/SiteHeader.astro'
+
+interface Props {
+  title: string
+  description: string
+}
+
+const { title, description } = Astro.props
+const canonical = new URL(Astro.url.pathname, Astro.site)
+---
+
+<!doctype html>
+<html lang="en" data-theme="dark">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{title} · The santi020k Way</title>
+    <meta name="description" content={description} />
+    <meta name="author" content="Santiago Molina" />
+    <meta name="theme-color" content="#110c1d" />
+    <link rel="canonical" href={canonical} />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content={`${title} · The santi020k Way`} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={canonical} />
+    <script is:inline src="/theme.js"></script>
+  </head>
+  <body id="top">
+    <a class="skip-link" href="#main">
+      Skip to content
+    </a>
+    <SiteHeader />
+    <main id="main" class="shell" tabindex="-1">
+      <slot />
+    </main>
+    <SiteFooter />
+    <UIPrimitives />
+  </body>
+</html>

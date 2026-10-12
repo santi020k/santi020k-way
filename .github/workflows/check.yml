@@ -1,35 +1,30 @@
 name: Check
-
 on:
-  pull_request:
-  push:
-    branches:
-      - main
+  pull_request: {}
+  workflow_call: {}
   workflow_dispatch: {}
-
 permissions:
   contents: read
-
 concurrency:
-  group: ${{ github.workflow }}-${{ github.ref }}
+  group: check-${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
-
 jobs:
   check:
     runs-on: ubuntu-latest
-    timeout-minutes: 10
+    timeout-minutes: 20
     steps:
-      - name: Check out repository
-        uses: actions/checkout@v7
-
-      - name: Install pnpm
-        uses: pnpm/action-setup@v6
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v6
+      - uses: actions/checkout@v7
+      - uses: pnpm/action-setup@v6
+      - uses: actions/setup-node@v6
         with:
           node-version: 22.x
           cache: pnpm
-
-      - name: Validate release standards
-        run: pnpm check
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm exec playwright install --with-deps chromium
+      - run: pnpm verify
+      - uses: actions/upload-artifact@v6
+        if: always()
+        with:
+          name: browser-evidence
+          path: test-results
+          retention-days: 7

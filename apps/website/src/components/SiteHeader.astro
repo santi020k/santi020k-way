@@ -1,0 +1,76 @@
+---
+import { Button, ButtonLink, Dialog, Icon, ThemeToggle } from '@santi020k/lumen-astro'
+
+import { isCurrentRoute, navigation } from '../lib/navigation'
+
+import Wordmark from './Wordmark.astro'
+
+const active = Astro.url.pathname
+---
+
+<header class="site-header">
+  <div class="header-inner shell">
+    <Wordmark />
+    <nav class="desktop-navigation" aria-label="Main navigation">
+      {navigation.filter(link => link.href !== '/').map(link => (
+        link.href === '/start/' ?
+          (
+            <ButtonLink href={link.href} variant="unstyled" class="header-start" aria-current={isCurrentRoute(active, link.href) ? 'page' : undefined}>
+              {link.label}<Icon name="arrow-up-right" aria-hidden="true" />
+            </ButtonLink>
+          ) :
+          <a href={link.href} aria-current={isCurrentRoute(active, link.href) ? 'page' : undefined}>{link.label}</a>
+      ))}
+    </nav>
+    <div class="header-utilities">
+      <ThemeToggle storageKey="way-theme" aria-label="Toggle color theme" />
+      <Button class="menu-trigger" variant="outline" data-ui-dialog-trigger="way-navigation" aria-controls="way-navigation" aria-label="Open navigation">
+        <span>Menu</span><Icon name="menu" aria-hidden="true" />
+      </Button>
+    </div>
+  </div>
+</header>
+
+<Dialog id="way-navigation" class="mobile-navigation" layout="fullscreen" aria-labelledby="navigation-title">
+  <div class="mobile-navigation-bar">
+    <Wordmark />
+    <Button class="menu-close" variant="outline" data-ui-dialog-close aria-label="Close navigation" autofocus>
+      <span>Close</span><Icon name="x" aria-hidden="true" />
+    </Button>
+  </div>
+  <div class="mobile-navigation-body">
+    <p class="eyebrow">The santi020k Way</p>
+    <h2 id="navigation-title">Find your way.</h2>
+    <nav aria-label="Mobile navigation">
+      {navigation.map((link, index) => (
+        <a href={link.href} aria-current={isCurrentRoute(active, link.href) ? 'page' : undefined}>
+          <span class="row-number" aria-hidden="true">{String(index + 1).padStart(2, '0')}</span>
+          <span><strong>{link.label}</strong><small>{link.description}</small></span>
+          <Icon name="arrow-up-right" aria-hidden="true" />
+        </a>
+      ))}
+    </nav>
+    <div class="mobile-navigation-bottom">
+      <p>One source.<br />For you and your agents.</p>
+      <div class="menu-appearance">
+        <span>Appearance</span>
+        <ThemeToggle storageKey="way-theme" aria-label="Change navigation appearance" />
+      </div>
+    </div>
+  </div>
+</Dialog>
+
+<script>
+  const dialog = document.querySelector('#way-navigation')
+  const desktop = window.matchMedia('(min-width: 761px)')
+
+  // Lumen owns opening, dismissal, and focus return; the site owns its breakpoint.
+  desktop.addEventListener('change', ({ matches }) => {
+    if (matches && dialog instanceof HTMLDialogElement && dialog.open) {
+      dialog.close()
+
+      // The mobile opener is hidden after resizing, so return to the visible identity.
+      requestAnimationFrame(() => document.querySelector<HTMLAnchorElement>('.site-header .wordmark')?.focus())
+    }
+  })
+</script>

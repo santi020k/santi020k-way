@@ -1,0 +1,35 @@
+{
+  "$schema": "https://turborepo.dev/schema.json",
+  "globalDependencies": [
+    "standards/**",
+    "docs/**",
+    "skills/**",
+    "templates/**",
+    "scripts/build-*.mjs",
+    "scripts/finalize-cli.mjs"
+  ],
+  "tasks": {
+    "build": {
+      "dependsOn": ["^build"],
+      "outputs": [
+        "dist/**",
+        "src/generated/**",
+        "public/downloads/**",
+        "public/sources/**"
+      ]
+    },
+    "typecheck": {
+      "dependsOn": ["build"],
+      "outputs": []
+    },
+    "test": {
+      "dependsOn": ["build"],
+      "outputs": []
+    },
+    "dev": {
+      "dependsOn": ["^build"],
+      "cache": false,
+      "persistent": true
+    }
+  }
+}

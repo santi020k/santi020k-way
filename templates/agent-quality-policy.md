@@ -1,4 +1,5 @@
 <!-- santi020k-quality-policy:start -->
+
 ## ESLint and TypeScript quality policy
 
 - Treat every ESLint warning and TypeScript diagnostic as work to resolve, not successful output.
@@ -16,4 +17,5 @@
   and diagnostic instead of hiding it.
 - Do not add ESLint or TypeScript to a repository that does not use that toolchain solely for
   uniformity; apply this policy when that toolchain exists or is introduced for project reasons.
+
 <!-- santi020k-quality-policy:end -->

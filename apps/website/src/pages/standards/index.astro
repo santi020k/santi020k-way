@@ -1,0 +1,84 @@
+---
+import { Icon, Input } from '@santi020k/lumen-astro'
+import { readCatalog } from '@santi020k/way/catalog'
+
+import Base from '../../layouts/Base.astro'
+
+const catalog = readCatalog()
+---
+
+<Base
+  title="Standards"
+  description="Browse the versioned design, engineering, architecture, and agent standards behind The santi020k Way."
+>
+  <header class="page-intro">
+    <p class="eyebrow">The field guide / {catalog.version}</p>
+    <h1>
+      Shared knowledge.
+      <br />
+      <em>Clear sources.</em>
+    </h1>
+    <p class="lead">
+      Find the convention that fits the task. Every entry carries its scope,
+      source, and review date.
+    </p>
+  </header>
+  <section class="catalog-section" aria-label="Browse standards">
+    <div class="search-field">
+      <label for="standards-search">Find a standard</label>
+      <Input
+        id="standards-search"
+        type="search"
+        placeholder="Try design, release, or Codex…"
+      />
+      <p id="result-count" role="status" aria-live="polite">
+        {catalog.entries.length} entries
+      </p>
+    </div>
+    <div class="catalog-grid">
+      {catalog.entries.map(entry => (
+        <a
+          class="catalog-entry"
+          href={`/standards/${entry.id}/`}
+          data-search={`${entry.title} ${entry.summary} ${entry.tags.join(' ')}`.toLowerCase()}
+        >
+          <p class="tiny-label">{entry.kind}</p>
+          <h2>
+            {entry.title} <Icon name="arrow-up-right" aria-hidden="true" />
+          </h2>
+          <p>{entry.summary}</p>
+          <span class="entry-date">Reviewed {entry.reviewedAt}</span>
+        </a>
+      ))}
+    </div>
+    <p id="empty-results" class="empty-state" hidden>
+      No matching standards. Try a broader term, such as “design” or “release”.
+    </p>
+  </section>
+</Base>
+<script>
+const input = document.querySelector<HTMLInputElement>('#standards-search')
+
+const entries = [
+  ...document.querySelectorAll<HTMLAnchorElement>('[data-search]')
+]
+
+const count = document.querySelector('#result-count')
+const empty = document.querySelector<HTMLElement>('#empty-results')
+
+input?.addEventListener('input', () => {
+  const query = input.value.trim().toLowerCase()
+  let visible = 0
+
+  for (const entry of entries) {
+    entry.hidden = !entry.dataset.search?.includes(query)
+
+    if (!entry.hidden) visible++
+  }
+
+  if (count)
+    count.textContent = `${visible} ${visible === 1 ? 'entry' : 'entries'}`
+
+  if (empty) empty.hidden = visible !== 0
+})
+</script>

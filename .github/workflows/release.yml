@@ -1,0 +1,44 @@
+name: Release
+on:
+  workflow_dispatch:
+    inputs:
+      publish-npm:
+        description: Publish npm through the configured trusted publisher
+        type: boolean
+        default: false
+permissions:
+  contents: read
+concurrency:
+  group: way-release
+  cancel-in-progress: false
+jobs:
+  validate:
+    uses: ./.github/workflows/check.yml
+  release:
+    needs: validate
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    environment: release
+    timeout-minutes: 25
+    permissions:
+      contents: write
+      id-token: write
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+      - uses: pnpm/action-setup@v6
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 24.x
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm build
+      - run: pnpm package:release
+      - name: Use the verified OIDC-capable npm CLI
+        run: npm install --global npm@12.2.0
+      - name: Publish immutable artifacts from this main commit
+        run: node scripts/publish-release.mjs
+        env:
+          GH_TOKEN: ${{ github.token }}
+          WAY_PUBLISH_NPM: ${{ inputs.publish-npm }}

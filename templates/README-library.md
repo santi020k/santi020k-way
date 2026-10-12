@@ -56,9 +56,9 @@ framework-specific usage.
 
 ## Packages
 
-| Package | Purpose | Documentation |
-| --- | --- | --- |
-| [`package-name`](https://www.npmjs.com/package/package-name) | Primary public API | [API reference](https://docs.example.com/api) |
+| Package                                                      | Purpose              | Documentation                                           |
+| ------------------------------------------------------------ | -------------------- | ------------------------------------------------------- |
+| [`package-name`](https://www.npmjs.com/package/package-name) | Primary public API   | [API reference](https://docs.example.com/api)           |
 | [`adapter-name`](https://www.npmjs.com/package/adapter-name) | Optional integration | [Adapter guide](https://docs.example.com/adapters/name) |
 
 ## Compatibility

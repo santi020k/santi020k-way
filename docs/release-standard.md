@@ -22,29 +22,35 @@ versioned changes.
 
 ### Lifecycle
 
-1. A feature pull request includes a changeset for a user-visible change.
-2. Merging to `main` creates or updates `changeset-release/main`.
-3. The release pull request contains final versions, changelogs, lockfile updates, and consumed
-   changesets.
-4. Normal pull-request validation runs against those exact artifacts.
-5. A maintainer merges the release pull request when the release is ready.
-6. The workflow publishes packages and downstream artifacts.
-7. The workflow verifies registry versions and creates immutable tags or GitHub Releases.
+1. Select the intended `release/v<semver>` from current repository evidence before branching.
+2. Feature work includes a Changeset for each user-visible package change and is validated and
+   integrated locally into that selected release.
+3. Run Changesets versioning on the release branch. Commit final versions, changelogs, lockfile
+   updates, migration notes, and consumed Changesets together.
+4. Obtain an independent review before the first release push or PR. Resolve findings and rerun
+   affected gates. Remote actions require explicit authorization.
+5. Open the release pull request into `main`. Normal validation and current review feedback must
+   pass against the exact final artifacts before an authorized merge.
+6. GitHub Actions publishes packages and downstream artifacts from that merged commit, creates
+   immutable version tags/releases, and verifies the published result.
 
-`changeset-release/main` is an ephemeral automation branch. Its absence after a release is normal.
+Some existing repositories use `changesets/action` with `changeset-release/main`. Preserve their
+explicit local workflow when applicable; it is not the branch convention for new Santiago-owned
+projects. The reusable template below assumes package-specific `check` and `release` scripts and
+a protected release environment. Version preparation belongs to the reviewed release branch.
 
 ### Required workflow properties
 
-- Trigger on pushes to `main`.
-- Provide `workflow_dispatch` for a controlled retry.
-- Set `cancel-in-progress: false`.
-- Grant `contents: write`, `pull-requests: write`, and `id-token: write` when npm provenance is used.
+- Run from merged `main`, through an explicit GitHub dispatch or the repository's approved trigger.
+- Provide a controlled retry and non-cancelling release concurrency.
+- Grant only required permissions; use `id-token: write` for npm Trusted Publishing/provenance.
 - Check out full history when tags or changelogs depend on it.
-- Pass `version`, `commit`, and `title` to `changesets/action`.
-- Use `NPM_CONFIG_PROVENANCE: "true"` for npm publication.
-- Gate extension, documentation, or umbrella-tag steps on
-  `steps.changesets.outputs.published == 'true'`.
-- Make every publish script idempotent and skip an already-published version.
+- Keep hooks enabled and run the complete preflight before publication.
+- Prefer npm Trusted Publishing. Bootstrap the initial package or a provider identity only through
+  a separately authorized, documented one-time step.
+- Make publication idempotent. Reuse an existing version only after verifying its source commit
+  and artifacts. A mismatched or incomplete release is a failure, not an excuse to overwrite it.
+- Verify registry metadata, immutable tags/artifacts, deployed versions, and public smoke checks.
 
 ### Automation token
 
@@ -85,8 +91,8 @@ TestFlight, Sparkle, Homebrew, and store publication are not Changesets package 
 
 1. Version and release metadata change through a reviewed pull request.
 2. CI validates the candidate commit.
-3. A maintainer creates an annotated semantic-version tag.
-4. The release workflow checks out that exact tag.
+3. GitHub Actions creates the immutable semantic-version tag from the reviewed, merged `main` commit.
+4. The delivery workflow checks out that exact merged commit and verifies the tag points to it.
 5. The workflow validates tag-to-metadata consistency before signing.
 6. It builds, signs, notarizes, and verifies the artifact.
 7. It publishes immutable versioned assets.
@@ -130,3 +136,7 @@ Deployment workflows should still:
 - Force-replacing immutable versioned tags or assets.
 - Making downstream publication run when no package was published.
 - Requiring every hosted application deployment to imitate an npm release.
+
+## Agent release integration
+
+Before a first release push or PR, obtain an independent review and disposition every finding. Prepare non-initial releases on `release/v<semver>` into `main`; never bypass hooks or failed gates. GitHub Actions creates tags and releases from merged `main`. Use GitHub-hosted standard macOS runners for public Apple projects, and Xcode Cloud for private Apple projects. See the full global instruction reference for approval, recovery, integration, and post-release requirements. Local implementation authorization does not authorize publication.

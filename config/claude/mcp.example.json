@@ -1,0 +1,8 @@
+{
+  "mcpServers": {
+    "santi020k-way": {
+      "command": "way",
+      "args": ["mcp"]
+    }
+  }
+}

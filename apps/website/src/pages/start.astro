@@ -1,0 +1,122 @@
+---
+import { Code, CodeTabs, Icon } from '@santi020k/lumen-astro'
+import { readCatalog } from '@santi020k/way/catalog'
+
+import Base from '../layouts/Base.astro'
+
+const setup = ['codex', 'claude'].map(agent => ({
+  value: agent,
+  label: agent === 'codex' ? 'Codex' : 'Claude Code',
+  language: 'bash',
+  code: [
+    `pnpm way setup ${agent}`,
+    '# Review the preview, then use its exact approval hash:',
+    `pnpm way setup ${agent} --apply <preview-hash>`
+  ].join('\n')
+}))
+---
+
+<Base
+  title="Get started"
+  description="Preview and install shared guidance for Codex and Claude Code, connect the local MCP catalog, and keep a verified rollback path."
+>
+  <header class="page-intro">
+    <p class="eyebrow">Start with a preview</p>
+    <h1>
+      Your workflow.
+      <br />
+      <em>A shared foundation.</em>
+    </h1>
+    <p class="lead">
+      Install the guidance you can inspect. Keep your personal settings and
+      choose when to update.
+    </p>
+  </header>
+  <div class="guide-steps">
+    <section>
+      <span class="row-number">01 / Build from source</span>
+      <h2>Prepare the local release.</h2>
+      <p>
+        Version {readCatalog().version} is a local release candidate. From the Way repository,
+        install the locked dependencies and build the CLI, both plugin
+        distributions, and this website. Node 22.22.3 or newer and pnpm 10.34.3
+        are required.
+      </p>
+      <Code
+        variant="block"
+        copy
+        code={'pnpm install --frozen-lockfile\npnpm build\npnpm way list'}
+        language="bash"
+      />
+    </section>
+    <section>
+      <span class="row-number">02 / Add your working agreements</span>
+      <h2>Review before changing anything.</h2>
+      <p>
+        The first command previews the managed instructions and local reference
+        paths. The second applies the exact preview. Existing text outside the
+        Way section is preserved; model, permission, trust, and credential
+        settings stay local.
+      </p>
+      <CodeTabs items={setup} ariaLabel="Agent setup commands" />
+      <p class="callout">
+        Already have extensive global instructions? The first install preserves
+        them. Compare overlapping guidance deliberately before removing your old
+        rules.
+      </p>
+    </section>
+    <section>
+      <span class="row-number">03 / Connect the plugin</span>
+      <h2>Bring the catalog into the conversation.</h2>
+      <p>
+        The generated packages include three skills and a self-contained,
+        read-only MCP server. Choose your agent’s local distribution; no npm
+        publication or hosted service is required.
+      </p>
+      <CodeTabs
+        ariaLabel="Plugin installation commands"
+        items={[
+          {
+            value: 'codex',
+            label: 'Codex',
+            language: 'bash',
+            code: 'codex plugin marketplace add ./packages/plugin/dist/codex\ncodex plugin add santi020k-way@santi020k-way'
+          },
+          {
+            value: 'claude',
+            label: 'Claude Code',
+            language: 'bash',
+            code: 'claude --plugin-dir ./packages/plugin/dist/claude/santi020k-way\n# For persistent installation, add the generated Claude marketplace.'
+          }
+        ]}
+      />
+      <p>
+        Ask: “Find the design guidance for this project” or “Review this change
+        against the santi020k standards.” Your repository’s instructions and
+        explicit decisions retain their scope.
+      </p>
+    </section>
+    <section>
+      <span class="row-number">04 / Keep a way back</span>
+      <h2>Updates are reversible.</h2>
+      <p>
+        Setup returns a backup ID. Rollback previews the restoration and refuses
+        to overwrite instructions edited since installation. Add{' '}
+        <code>--home /absolute/path</code> to test either agent in a separate
+        directory.
+      </p>
+      <Code
+        variant="block"
+        copy
+        code={
+          'pnpm way rollback codex --backup <backup-id>\npnpm way rollback codex --backup <backup-id> --apply <preview-hash>'
+        }
+        language="bash"
+      />
+      <a class="text-action" href="/standards/agent-configuration/">
+        Read the configuration contract{' '}
+        <Icon name="arrow-right" aria-hidden="true" />
+      </a>
+    </section>
+  </div>
+</Base>

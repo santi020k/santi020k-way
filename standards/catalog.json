@@ -1,0 +1,151 @@
+[
+  {
+    "id": "core",
+    "title": "Shared working agreements",
+    "summary": "The essential defaults for evidence, implementation, safety, and delivery.",
+    "kind": "standard",
+    "source": "standards/core.md",
+    "tags": ["engineering", "workflow", "global", "instructions"],
+    "scope": "Santiago-owned projects; project-specific instructions take precedence",
+    "status": "accepted",
+    "reviewedAt": "2026-10-12"
+  },
+  {
+    "id": "global-original",
+    "title": "Full global instruction reference",
+    "summary": "The complete original Codex working agreements, preserved for traceability.",
+    "kind": "reference",
+    "source": "standards/reference/global-original.md",
+    "tags": ["codex", "global", "release", "security", "data", "infisical"],
+    "scope": "Santiago-owned projects; project-specific instructions take precedence",
+    "status": "reference",
+    "reviewedAt": "2026-10-12"
+  },
+  {
+    "id": "design",
+    "title": "Design and brand",
+    "summary": "The Sculpted visual direction, semantic tokens, Lumen, and accessibility.",
+    "kind": "standard",
+    "source": "standards/design.md",
+    "tags": ["design", "website", "brand", "lumen", "theme", "accessibility"],
+    "scope": "Santiago-owned projects; project-specific instructions take precedence",
+    "status": "accepted",
+    "reviewedAt": "2026-10-12"
+  },
+  {
+    "id": "packages",
+    "title": "Preferred tools and package boundaries",
+    "summary": "Choose Santiago-owned tools with practical setup, examples, verification, and scoped exceptions.",
+    "kind": "standard",
+    "source": "standards/packages.md",
+    "tags": [
+      "packages",
+      "lumen",
+      "theme",
+      "quality",
+      "eslint",
+      "eslint config basic",
+      "astro",
+      "astro doctor",
+      "astro-doctor",
+      "commitprompt",
+      "dep beacon",
+      "dep-beacon",
+      "og",
+      "open graph",
+      "santi-og",
+      "auth"
+    ],
+    "scope": "Santiago-owned projects; project-specific instructions take precedence",
+    "status": "accepted",
+    "reviewedAt": "2026-10-12"
+  },
+  {
+    "id": "architecture",
+    "title": "Architecture decisions",
+    "summary": "Keep reusable contracts and consumer business rules in their correct owners.",
+    "kind": "standard",
+    "source": "standards/architecture.md",
+    "tags": ["architecture", "decisions", "contracts"],
+    "scope": "Santiago-owned projects; project-specific instructions take precedence",
+    "status": "accepted",
+    "reviewedAt": "2026-10-12"
+  },
+  {
+    "id": "agent-configuration",
+    "title": "Agent configuration",
+    "summary": "Global entry points, safe setup, versioned references, and local runtime settings.",
+    "kind": "standard",
+    "source": "standards/agent-configuration.md",
+    "tags": ["codex", "claude", "setup", "configuration", "rollback"],
+    "scope": "Santiago-owned projects; project-specific instructions take precedence",
+    "status": "accepted",
+    "reviewedAt": "2026-10-12"
+  },
+  {
+    "id": "quality",
+    "title": "Quality without a mute button",
+    "summary": "Zero-warning lint, accurate types, and executable validation.",
+    "kind": "standard",
+    "source": "docs/quality-standard.md",
+    "tags": ["quality", "lint", "typescript", "tests"],
+    "scope": "Santiago-owned projects; project-specific instructions take precedence",
+    "status": "accepted",
+    "reviewedAt": "2026-10-12"
+  },
+  {
+    "id": "release",
+    "title": "Release engineering",
+    "summary": "Package, native, and website delivery with review and reproducible artifacts.",
+    "kind": "standard",
+    "source": "docs/release-standard.md",
+    "tags": ["release", "ci", "publication", "deploy", "github"],
+    "scope": "Santiago-owned projects; project-specific instructions take precedence",
+    "status": "accepted",
+    "reviewedAt": "2026-10-12"
+  },
+  {
+    "id": "pull-requests",
+    "title": "Pull request standard",
+    "summary": "Reviewable scope, semantic titles, and clear validation evidence.",
+    "kind": "standard",
+    "source": "docs/pull-request-standard.md",
+    "tags": ["review", "pull requests", "commits"],
+    "scope": "Santiago-owned projects; project-specific instructions take precedence",
+    "status": "accepted",
+    "reviewedAt": "2026-10-12"
+  },
+  {
+    "id": "presentation",
+    "title": "Repository presentation",
+    "summary": "Useful READMEs and accurate package metadata.",
+    "kind": "standard",
+    "source": "docs/repository-presentation-standard.md",
+    "tags": ["readme", "documentation", "metadata"],
+    "scope": "Santiago-owned projects; project-specific instructions take precedence",
+    "status": "accepted",
+    "reviewedAt": "2026-10-12"
+  },
+  {
+    "id": "0001-shared-sources",
+    "title": "Share sources; adapt delivery",
+    "summary": "Why Way uses a local catalog, generated plugins, and a Turborepo.",
+    "kind": "decision",
+    "source": "standards/decisions/0001-shared-sources.md",
+    "tags": ["architecture", "turbo", "mcp", "plugins"],
+    "scope": "The santi020k Way",
+    "status": "accepted",
+    "reviewedAt": "2026-10-12"
+  },
+  {
+    "id": "0002-local-configuration",
+    "title": "Keep machine configuration local",
+    "summary": "Why setup preserves user content and uses reviewed, reversible changes.",
+    "kind": "decision",
+    "source": "standards/decisions/0002-local-configuration.md",
+    "tags": ["architecture", "setup", "rollback", "privacy"],
+    "scope": "The santi020k Way",
+    "status": "accepted",
+    "reviewedAt": "2026-10-12"
+  }
+]

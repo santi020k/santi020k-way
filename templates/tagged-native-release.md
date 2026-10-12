@@ -4,7 +4,8 @@ Use this checklist for signed macOS, iOS, TestFlight, Sparkle, and Homebrew rele
 
 ## Trigger
 
-- Accept semantic-version tags such as `v1.2.3`.
+- GitHub Actions creates semantic-version tags such as `v1.2.3` from reviewed, merged `main`.
+- Route public Apple builds through standard GitHub-hosted macOS runners and private Apple builds through Xcode Cloud.
 - Provide a manual dispatch input for retrying an existing tag.
 - Use non-cancelling release concurrency.
 - Check out the exact requested tag with full history.

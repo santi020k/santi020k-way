@@ -58,11 +58,11 @@ Explain the first-run experience and link to the
 
 ## Applications and services
 
-| Surface | Path | Purpose | Destination |
-| --- | --- | --- | --- |
-| Product app | [`apps/product`](apps/product) | Main user experience | [Download](https://product.example.com/download) |
-| Website | [`apps/website`](apps/website) | Marketing and support | [Visit](https://product.example.com) |
-| API | [`apps/api`](apps/api) | Product backend | [API docs](https://docs.example.com/api) |
+| Surface     | Path                           | Purpose               | Destination                                      |
+| ----------- | ------------------------------ | --------------------- | ------------------------------------------------ |
+| Product app | [`apps/product`](apps/product) | Main user experience  | [Download](https://product.example.com/download) |
+| Website     | [`apps/website`](apps/website) | Marketing and support | [Visit](https://product.example.com)             |
+| API         | [`apps/api`](apps/api)         | Product backend       | [API docs](https://docs.example.com/api)         |
 
 ## Documentation
 

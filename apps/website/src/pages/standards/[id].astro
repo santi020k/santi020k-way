@@ -1,0 +1,59 @@
+---
+import { createMarkdownProcessor } from '@astrojs/markdown-remark'
+import { Icon } from '@santi020k/lumen-astro'
+import type { Standard } from '@santi020k/way/catalog'
+import { readCatalog } from '@santi020k/way/catalog'
+
+import Base from '../../layouts/Base.astro'
+import { localTemplateLinks } from '../../lib/markdown-links'
+
+export const getStaticPaths = () => readCatalog().entries.map(entry => ({
+  params: { id: entry.id },
+  props: { entry }
+}))
+
+interface Props {
+  entry: Standard
+}
+
+const { entry } = Astro.props
+const processor = await createMarkdownProcessor({ remarkPlugins: [localTemplateLinks] })
+const result = await processor.render(entry.content.replace(/^# .+\n/u, ''))
+---
+
+<Base title={entry.title} description={entry.summary}>
+  <header class="document-intro">
+    <a class="back-link" href="/standards/">
+      <Icon name="arrow-left" aria-hidden="true" />
+      All standards
+    </a>
+    <p class="eyebrow">
+      {entry.kind} / {entry.status}
+    </p>
+    <h1>{entry.title}</h1>
+    <p class="lead">{entry.summary}</p>
+  </header>
+  <div class="document-layout">
+    <aside class="provenance" aria-label="Source information">
+      <dl>
+        <dt>Scope</dt>
+        <dd>{entry.scope}</dd>
+        <dt>Reviewed</dt>
+        <dd>{entry.reviewedAt}</dd>
+        <dt>Source file</dt>
+        <dd>
+          <code>{entry.source}</code>
+        </dd>
+        <dt>Content fingerprint</dt>
+        <dd>
+          <code>{entry.contentHash.slice(0, 12)}</code>
+        </dd>
+      </dl>
+      <p>
+        Resolve package versions and project decisions from current repository
+        evidence.
+      </p>
+    </aside>
+    <article class="prose" set:html={result.code} />
+  </div>
+</Base>
