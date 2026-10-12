@@ -19,6 +19,8 @@ for (const route of ['/', '/standards/', '/start/', '/architecture/', '/standard
 
     await expect(page.locator('h1')).toHaveCount(1)
 
+    await expect(page.locator('footer .footer-version')).toContainText(`v${readCatalog().version}`)
+
     await expect(page.locator('link[rel="canonical"]')).toHaveAttribute('href', `https://way.santi020k.com${route}`)
 
     expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true)

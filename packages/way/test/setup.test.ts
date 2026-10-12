@@ -1,6 +1,7 @@
 import assert from 'node:assert/strict'
 import {
   chmod,
+  mkdir,
   mkdtemp,
   readFile,
   realpath,
@@ -297,4 +298,110 @@ await test('installation and rollback preserve permissions under a restrictive u
   } finally {
     process.umask(previousMask)
   }
+})
+
+for (const agent of ['codex', 'claude'] as const) {
+  await test(`${agent}: invalid UTF-8 is refused without changing the original bytes`, async t => {
+    const home = await fixture(t)
+    const target = join(home, agent === 'codex' ? 'AGENTS.md' : 'CLAUDE.md')
+    const bytes = Buffer.from([0x23, 0x20, 0xc3, 0x28, 0x0a])
+
+    await writeFile(target, bytes)
+
+    await assert.rejects(planSetup(agent, home), /valid UTF-8/u)
+
+    await assert.rejects(applySetup(agent, home, 'invalid'), /valid UTF-8/u)
+
+    assert.deepEqual(await readFile(target), bytes)
+
+    await assert.rejects(stat(join(home, 'way')), { code: 'ENOENT' })
+  })
+
+  await test(`${agent}: a UTF-8 BOM and non-ASCII guidance survive setup and rollback`, async t => {
+    const home = await fixture(t)
+    const target = join(home, agent === 'codex' ? 'AGENTS.md' : 'CLAUDE.md')
+    const bytes = Buffer.from('\ufeff# Personal guidance\r\nConserva los acentos: áéíóú. 🦊\r\n')
+
+    await writeFile(target, bytes)
+
+    const plan = await planSetup(agent, home)
+
+    assert.ok(plan.after?.startsWith(bytes.toString('utf8')))
+
+    const installed = await applySetup(agent, home, plan.approval)
+
+    assert.ok(installed.backup)
+
+    const undo = await planRollback(agent, home, installed.backup)
+
+    await applyRollback(agent, home, installed.backup, undo.approval)
+
+    assert.deepEqual(await readFile(target), bytes)
+  })
+}
+
+await test('rollback rejects malformed receipt fields before restoring instructions', async t => {
+  const home = await fixture(t)
+  const original = 'Personal instructions.\n'
+
+  await writeFile(join(home, 'AGENTS.md'), original)
+
+  const setup = await planSetup('codex', home)
+  const installed = await applySetup('codex', home, setup.approval)
+
+  assert.ok(installed.backup)
+
+  const path = join(home, 'way', 'backups', `${installed.backup}.json`)
+  const saved = await readFile(path, 'utf8')
+  const receipt: unknown = JSON.parse(saved)
+
+  assert.ok(typeof receipt === 'object' && receipt !== null)
+
+  for (const fields of [
+    { before: 'x'.repeat(1_048_577) },
+    { before: 'é'.repeat(524_289) },
+    { mode: -1 },
+    { mode: 0o1000 },
+    { mode: 1.5 },
+    { afterHash: 'invalid' },
+    { createdAt: 'not-a-date' }
+  ]) {
+    await writeFile(path, JSON.stringify({ ...receipt, ...fields }))
+
+    await assert.rejects(planRollback('codex', home, installed.backup))
+
+    await assert.rejects(applyRollback('codex', home, installed.backup, 'invalid'))
+
+    assert.equal(await readFile(setup.target, 'utf8'), setup.after)
+  }
+
+  await writeFile(path, saved)
+
+  const undo = await planRollback('codex', home, installed.backup)
+
+  await applyRollback('codex', home, installed.backup, undo.approval)
+
+  assert.equal(await readFile(setup.target, 'utf8'), original)
+})
+
+await test('rollback refuses oversized and non-regular receipts', async t => {
+  const home = await fixture(t)
+  const setup = await planSetup('codex', home)
+  const installed = await applySetup('codex', home, setup.approval)
+
+  assert.ok(installed.backup)
+
+  const path = join(home, 'way', 'backups', `${installed.backup}.json`)
+
+  await writeFile(path, ' '.repeat(1_048_576 * 6 + 4097))
+
+  await assert.rejects(planRollback('codex', home, installed.backup), /regular file within/u)
+
+  await rm(path)
+
+  await mkdir(path)
+
+  await assert.rejects(planRollback('codex', home, installed.backup), /regular file within/u)
+
+  assert.equal(await readFile(setup.target, 'utf8'), setup.after)
 })

@@ -1,12 +1,21 @@
 import { defineConfig } from '@playwright/test'
 
+const port = Number(process.env.WAY_TEST_PORT ?? '4329')
+
+if (!Number.isInteger(port) || port < 1024 || port > 65535)
+  throw new Error('WAY_TEST_PORT must be an integer between 1024 and 65535.')
+
+const baseURL = `http://127.0.0.1:${port}`
+const preview = 'pnpm --filter @santi020k/way-website exec astro preview'
+const command = `${preview} --host 127.0.0.1 --port ${port} --ignore-lock`
+
 export default defineConfig({
   testDir: './tests',
   fullyParallel: true,
   forbidOnly: Boolean(process.env.CI),
   retries: process.env.CI ? 1 : 0,
-  use: { baseURL: 'http://127.0.0.1:4328', trace: 'retain-on-failure' },
-  webServer: { command: 'pnpm --filter @santi020k/way-website preview', url: 'http://127.0.0.1:4328', reuseExistingServer: !process.env.CI },
+  use: { baseURL, trace: 'retain-on-failure' },
+  webServer: { command, url: baseURL, reuseExistingServer: false },
   projects: (['desktop', 'mobile'] as const).flatMap(size => (['dark', 'light'] as const).map(theme => ({
     name: `${size}-${theme}`,
     use: {

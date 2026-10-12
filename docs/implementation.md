@@ -11,6 +11,9 @@ review date describes the guidance, not the current version of a referenced libr
 `packages/way` validates the generated catalog, exposes typed queries, runs the read-only stdio
 MCP server, and manages local instructions. `scripts/build-catalog.mjs` creates its JSON artifact
 and an internal generated module so both Node and Astro bundle the same source safely.
+`packages/way/src/catalog-schema.ts` owns shared build/runtime validation: safe IDs and relative
+Markdown sources, unique identities, a required core entry, ISO review dates, and verified
+SHA-256 hashes. Hashes use the schema-normalized entry order so build and runtime agree.
 
 `skills/way-build`, `skills/way-review`, and `skills/way-release` hold task workflows. The plugin
 builder materializes their linked references from the catalog; generated copies are never edited
@@ -59,7 +62,11 @@ merge the relevant section manually, or install the plugin that supplies it. Use
 registration per host. No real agent home is modified by repository validation.
 Both existing and proposed instruction files must fit the supported 1 MiB limit. Setup rejects an
 oversized proposal during preview, before creating references or backups, so installed files remain
-readable by updates and rollback.
+readable by updates and rollback. Invalid UTF-8 is rejected before instruction writes; UTF-8 BOMs,
+non-ASCII text and existing line endings round-trip unchanged. Rollback accepts only regular,
+bounded receipt files with valid hashes, timestamps, ordinary permission bits and restored content
+within the instruction size limit. These checks validate receipt structure, not authenticity;
+backup receipts must remain private and trusted.
 
 ## Tooling decisions
 
@@ -86,6 +93,9 @@ pre-push and GitHub Actions completion gate. `pnpm test:browser` covers represen
 WCAG checks, responsive overflow, search, theme persistence, keyboard tabs, mobile navigation,
 focus return, no-JavaScript navigation, and footer links. Generated plugin
 MCP servers are exercised from isolated directories without repository dependencies.
+Browser tests start a fresh worktree-local preview on port 4329 (`WAY_TEST_PORT` overrides it);
+the `--ignore-lock` option prevents Astro from auto-backgrounding in agent environments so
+Playwright owns server cleanup. Tests refuse occupied ports and verify the rendered package version to catch stale previews.
 Marketplace manifests are checked alongside their plugin listings and source paths. For host
 validation, run `claude plugin validate` on the Claude package and marketplace; Codex can install
 the generated marketplace into a temporary profile. `pnpm audit:all` remains an optional sibling

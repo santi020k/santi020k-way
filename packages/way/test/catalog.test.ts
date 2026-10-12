@@ -3,6 +3,7 @@ import { createHash } from 'node:crypto'
 import { test } from 'node:test'
 
 import { getStandard, readCatalog, searchStandards } from '../dist/catalog.js'
+import { catalogMetadataSchema, parseCatalog, standardSchema } from '../dist/catalog-schema.js'
 
 await test('every catalog record has verifiable provenance and unique identity', () => {
   const catalog = readCatalog()
@@ -66,4 +67,34 @@ await test('tool names and aliases retrieve the package usage guide', () => {
 
     assert.equal(getStandard(match.id).source, 'standards/packages.md')
   }
+})
+
+await test('catalog validation rejects tampering and malformed source metadata', () => {
+  const catalog = readCatalog()
+  const entry = catalog.entries[0]
+
+  assert.ok(entry)
+
+  for (const change of [
+    { content: `${entry.content} changed` },
+    { contentHash: '0'.repeat(64) },
+    { id: '../../escape' },
+    { source: 'standards/../private.md' },
+    { source: '/absolute.md' },
+    { source: 'https://example.com/file.md' },
+    { source: 'standards//file.md' },
+    { reviewedAt: '2026-02-30' },
+    { title: '' },
+    { tags: [] }
+  ]) {
+    assert.throws(() => standardSchema.parse({ ...entry, ...change }))
+  }
+
+  assert.throws(() => parseCatalog({ ...catalog, hash: '0'.repeat(64) }), /Catalog hash/u)
+
+  assert.throws(() => parseCatalog({ ...catalog, entries: [...catalog.entries, entry] }), /unique/u)
+
+  assert.throws(() => catalogMetadataSchema.parse(catalog.entries.filter(item => item.id !== 'core')), /core/u)
+
+  assert.deepEqual(parseCatalog(catalog), catalog)
 })
