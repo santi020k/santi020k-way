@@ -1,5 +1,23 @@
 [
   {
+    "id": "way-of-working",
+    "title": "The santi020k way of working",
+    "summary": "A practical guide for people: understand the project, write clear code, collaborate, verify, and deliver safely.",
+    "kind": "reference",
+    "source": "docs/way-of-working.md",
+    "tags": [
+      "humans",
+      "onboarding",
+      "workflow",
+      "code",
+      "collaboration",
+      "documentation"
+    ],
+    "scope": "Santiago-owned projects; project-specific instructions take precedence",
+    "status": "reference",
+    "reviewedAt": "2026-10-12"
+  },
+  {
     "id": "core",
     "title": "Shared working agreements",
     "summary": "The essential defaults for evidence, implementation, safety, and delivery.",

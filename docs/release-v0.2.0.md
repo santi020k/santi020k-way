@@ -9,6 +9,9 @@ deployment on 2026-10-12. npm publication remains disabled until its publisher i
 
 ## Contents
 
+- Add a human-focused way-of-working guide, shared through the catalog, CLI, and website, with
+  practical examples, a reading map, and implementation versus delivery expectations.
+
 - Remove references to the retired Difftale project from maintained guidance and the sibling inventory.
 - Add read-only `way backups <codex|claude>` to discover private receipt IDs, creation times and
   current rollback availability. Listing validates receipts without returning saved instruction text

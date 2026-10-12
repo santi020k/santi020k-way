@@ -24,6 +24,16 @@ Read the guides at [way.santi020k.com](https://way.santi020k.com), explore the
 from [GitHub Releases](https://github.com/santi020k/santi020k-way/releases).
 Publication and deployment follow the [release plan](docs/release-v0.2.0.md).
 
+## Understand the way of working
+
+Start with [The santi020k way of working](docs/way-of-working.md), a guide for people joining,
+contributing to, or maintaining a project. It explains how to understand a task, write clear code,
+choose tools, build usable interfaces, collaborate with assistants, and verify delivery—with a
+practical task walkthrough and examples.
+
+No agent setup is required to read or apply it. For a specific task, follow the guide's reading
+map into the detailed standards. Repository-specific decisions keep their own scope.
+
 ## Start locally
 
 Requires Node >=22.22.3 and pnpm 10.34.3.

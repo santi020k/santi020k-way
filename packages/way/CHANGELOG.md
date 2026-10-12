@@ -4,6 +4,8 @@
 
 ### Minor Changes
 
+- Add a human-focused way-of-working guide to the shared catalog, with practical code and workflow examples, a reading map, and clear implementation and delivery expectations.
+
 - Remove references to the retired Difftale project from the shared package guidance and repository inventory.
 
 - Add read-only `way backups <codex|claude>` to discover saved rollback IDs, timestamps, and current rollback availability without exposing private instruction content. Listing uses the same strict receipt validation as rollback and preserves later personal edits.

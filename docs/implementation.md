@@ -24,8 +24,9 @@ manifests, host adapters, skills, and bundled MCP runtimes. The Claude adapter e
 `apps/website` renders the same catalog with Astro, Lumen, and Theme. It includes search, source
 provenance, architecture decisions, installation examples, light/dark themes and canonical
 metadata for `https://way.santi020k.com`. No catalog service, database, tracking or credentials are
-needed to run it. Documentation templates are served as downloads rather than broken repository
-relative links.
+needed to run it. Catalog links resolve from each document’s owning source to the corresponding website route,
+so the same Markdown remains navigable in the repository. Documentation templates are served
+as downloads rather than broken repository-relative links.
 Source and download directories are regenerated from scratch so retired catalog entries and
 templates are removed on incremental builds; other public assets remain intact.
 
