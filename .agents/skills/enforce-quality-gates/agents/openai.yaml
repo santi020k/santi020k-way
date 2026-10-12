@@ -1,4 +1,4 @@
 interface:
-  display_name: "Enforce Quality Gates"
-  short_description: "Keep ESLint and TypeScript at zero debt"
-  default_prompt: "Use $enforce-quality-gates to fix all feasible ESLint warnings and TypeScript errors, then verify the repository quality gates."
+  display_name: 'Enforce Quality Gates'
+  short_description: 'Keep ESLint and TypeScript at zero debt'
+  default_prompt: 'Use $enforce-quality-gates to fix all feasible ESLint warnings and TypeScript errors, then verify the repository quality gates.'

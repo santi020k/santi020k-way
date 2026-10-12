@@ -1,0 +1,31 @@
+{
+  "type": "module",
+  "version": "0.1.0",
+  "license": "MIT",
+  "author": {
+    "name": "Santiago Molina",
+    "url": "https://santi020k.com"
+  },
+  "homepage": "https://way.santi020k.com",
+  "engines": {
+    "node": ">=22.18.0"
+  },
+  "name": "@santi020k/way-website",
+  "private": true,
+  "scripts": {
+    "dev": "node ../../scripts/build-website-sources.mjs && astro dev --host 127.0.0.1 --port 4328",
+    "build": "node ../../scripts/build-website-sources.mjs && astro build",
+    "typecheck": "astro check",
+    "preview": "astro preview --host 127.0.0.1 --port 4328"
+  },
+  "dependencies": {
+    "@astrojs/markdown-remark": "7.3.2",
+    "@santi020k/lumen-astro": "4.0.0",
+    "@santi020k/theme": "2.0.1",
+    "@santi020k/way": "workspace:*",
+    "astro": "7.3.8"
+  },
+  "devDependencies": {
+    "@astrojs/check": "0.9.10"
+  }
+}

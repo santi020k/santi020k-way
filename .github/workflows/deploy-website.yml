@@ -1,0 +1,53 @@
+name: Deploy website
+on:
+  workflow_dispatch: {}
+permissions:
+  contents: read
+concurrency:
+  group: way-production
+  cancel-in-progress: false
+jobs:
+  deploy:
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    environment:
+      name: production
+      url: https://way.santi020k.com
+    permissions:
+      contents: read
+      id-token: write
+    env:
+      CLOUDFLARE_ACCOUNT_ID: ${{ vars.CLOUDFLARE_ACCOUNT_ID }}
+      INFISICAL_IDENTITY_ID: ${{ vars.INFISICAL_IDENTITY_ID }}
+      INFISICAL_PROJECT_ID: ${{ vars.INFISICAL_PROJECT_ID }}
+      INFISICAL_ENVIRONMENT: ${{ vars.INFISICAL_ENVIRONMENT }}
+      INFISICAL_SECRET_PATH: ${{ vars.INFISICAL_SECRET_PATH }}
+      INFISICAL_DOMAIN: ${{ vars.INFISICAL_DOMAIN }}
+    steps:
+      - uses: actions/checkout@v7
+      - uses: pnpm/action-setup@v6
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 22.x
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm check
+      - run: pnpm exec playwright install --with-deps chromium
+      - run: pnpm test:browser
+      - name: Verify explicitly configured deployment targets
+        run: node scripts/prepare-deployment.mjs
+      - uses: Infisical/secrets-action@v1.0.12
+        with:
+          method: oidc
+          identity-id: ${{ vars.INFISICAL_IDENTITY_ID }}
+          project-id: ${{ vars.INFISICAL_PROJECT_ID }}
+          domain: ${{ vars.INFISICAL_DOMAIN }}
+          env-slug: ${{ vars.INFISICAL_ENVIRONMENT }}
+          secret-path: ${{ vars.INFISICAL_SECRET_PATH }}
+          secret-name: CLOUDFLARE_API_TOKEN
+          include-imports: false
+      - name: Deploy static assets and custom domain
+        run: pnpm exec wrangler deploy --config apps/website/wrangler.jsonc
+      - name: Verify public routes and deployed revision
+        run: node scripts/smoke-website.mjs

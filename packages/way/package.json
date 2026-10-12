@@ -1,0 +1,53 @@
+{
+  "type": "module",
+  "version": "0.1.0",
+  "license": "MIT",
+  "author": {
+    "name": "Santiago Molina",
+    "url": "https://santi020k.com"
+  },
+  "homepage": "https://way.santi020k.com",
+  "engines": {
+    "node": ">=22.18.0"
+  },
+  "name": "@santi020k/way",
+  "description": "Versioned engineering guidance, safe agent setup, and a read-only MCP catalog.",
+  "bin": {
+    "way": "./dist/cli.js"
+  },
+  "exports": {
+    "./catalog": {
+      "types": "./dist/catalog.d.ts",
+      "import": "./dist/catalog.js"
+    }
+  },
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE"
+  ],
+  "scripts": {
+    "build": "node ../../scripts/build-catalog.mjs && tsc -p tsconfig.build.json && node ../../scripts/finalize-cli.mjs",
+    "typecheck": "tsc -p tsconfig.json",
+    "test": "node --test test/*.test.ts"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/server": "2.3.1",
+    "zod": "4.6.7"
+  },
+  "devDependencies": {
+    "@modelcontextprotocol/client": "2.3.1"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "private": false,
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/santi020k/santi020k-way.git",
+    "directory": "packages/way"
+  },
+  "bugs": {
+    "url": "https://github.com/santi020k/santi020k-way/issues"
+  }
+}

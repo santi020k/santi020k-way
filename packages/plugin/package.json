@@ -1,0 +1,21 @@
+{
+  "type": "module",
+  "version": "0.1.0",
+  "license": "MIT",
+  "author": {
+    "name": "Santiago Molina",
+    "url": "https://santi020k.com"
+  },
+  "homepage": "https://way.santi020k.com",
+  "engines": {
+    "node": ">=22.18.0"
+  },
+  "name": "@santi020k/way-plugin",
+  "private": true,
+  "scripts": {
+    "build": "node ../../scripts/build-plugin.mjs"
+  },
+  "dependencies": {
+    "@santi020k/way": "workspace:*"
+  }
+}

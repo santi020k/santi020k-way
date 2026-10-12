@@ -1,0 +1,212 @@
+---
+import { ButtonLink, Icon } from '@santi020k/lumen-astro'
+import { readCatalog } from '@santi020k/way/catalog'
+
+import Base from '../layouts/Base.astro'
+
+const areas = [
+  {
+    number: '01',
+    title: 'Design with a point of view.',
+    text: 'The Sculpted visual language, shared Theme tokens, and accessible Lumen components. Recognizable, without making every product the same.',
+    href: '/standards/design/',
+    label: 'Design & brand'
+  },
+  {
+    number: '02',
+    title: 'Choose what belongs.',
+    text: 'Find the right owned library. Keep reusable contracts in packages and business rules in the application. Record the reason behind a decision.',
+    href: '/standards/packages/',
+    label: 'Libraries & architecture'
+  },
+  {
+    number: '03',
+    title: 'Make quality observable.',
+    text: 'Strict types, meaningful tests, readable changes, and checks you can reproduce. Every claim comes with evidence of what actually ran.',
+    href: '/standards/quality/',
+    label: 'Engineering & delivery'
+  }
+]
+---
+
+<Base
+  title="A shared way to build"
+  description="Santiago Molina’s design language, engineering standards, and agent workflows. One versioned source for Codex, Claude Code, and the people building with them."
+>
+  <section class="hero">
+    <div class="hero-copy">
+      <p class="eyebrow">
+        The santi020k Way <span class="version">{readCatalog().version} / local preview</span>
+      </p>
+      <h1>
+        A shared way
+        <br />
+        to <em>build.</em>
+      </h1>
+      <p class="lead">
+        The decisions, design language, and engineering habits behind the work.
+        Ready for you—and the agents working alongside you.
+      </p>
+      <div class="actions">
+        <ButtonLink href="/start/" variant="unstyled" class="primary-action">
+          Bring it to your workflow{' '}
+          <span>
+            <Icon name="arrow-up-right" aria-hidden="true" />
+          </span>
+        </ButtonLink>
+        <ButtonLink href="/standards/" variant="unstyled" class="text-action">
+          Explore the standards <Icon name="arrow-right" aria-hidden="true" />
+        </ButtonLink>
+      </div>
+      <p class="hero-note">
+        For Codex & Claude Code. Built from the same sources.
+      </p>
+    </div>
+    <div
+      class="context-card"
+      aria-label="A shared source connects your standards to Codex and Claude Code"
+    >
+      <div class="context-top">
+        <span class="tiny-label">Working context</span>
+        <span class="context-status">
+          <span></span>Versioned & traceable
+        </span>
+      </div>
+      <div class="context-request">
+        <span class="prompt-sign" aria-hidden="true">
+          &gt;
+        </span>
+        <p>
+          Build this
+          <br />
+          the santi020k way<span class="prompt-dot">.</span>
+        </p>
+      </div>
+      <div class="context-sources">
+        <p class="tiny-label">The right guidance, when it matters</p>
+        <a href="/standards/design/">
+          <Icon name="palette" aria-hidden="true" />
+          <span>Design & brand</span>
+          <code>theme + lumen</code>
+        </a>
+        <a href="/standards/architecture/">
+          <Icon name="layers" aria-hidden="true" />
+          <span>Architecture</span>
+          <code>scoped decisions</code>
+        </a>
+        <a href="/standards/core/">
+          <Icon name="terminal" aria-hidden="true" />
+          <span>Working agreements</span>
+          <code>shared standards</code>
+        </a>
+      </div>
+      <div class="context-clients">
+        <span>One source</span>
+        <span class="context-line" aria-hidden="true"></span>
+        <span>Codex</span>
+        <span>Claude Code</span>
+      </div>
+    </div>
+  </section>
+  <div class="principle-strip">
+    <span>01 / Read the project</span>
+    <span>02 / Find the right guidance</span>
+    <span>03 / Build & verify</span>
+  </div>
+  <section class="section">
+    <div class="section-heading">
+      <p class="eyebrow">A little less rediscovery</p>
+      <h2>
+        Good decisions
+        <br />
+        should travel.
+      </h2>
+      <p>
+        Keep the useful context close to the work. Give every tool a clear
+        owner, and every convention a reason.
+      </p>
+    </div>
+    <div class="area-list">
+      {areas.map(area => (
+        <a class="area-row" href={area.href}>
+          <span class="row-number">{area.number}</span>
+          <div>
+            <p class="tiny-label">{area.label}</p>
+            <h3>{area.title}</h3>
+            <p>{area.text}</p>
+          </div>
+          <Icon name="arrow-up-right" aria-hidden="true" />
+        </a>
+      ))}
+    </div>
+  </section>
+  <section class="section ecosystem">
+    <div>
+      <p class="eyebrow">Built on familiar foundations</p>
+      <h2>
+        Your tools.
+        <br />
+        Their real contracts.
+      </h2>
+      <p class="section-copy">
+        Way connects the ecosystem. Lumen owns the components, Theme owns the
+        visual foundations, and your project keeps its own decisions.
+      </p>
+      <ButtonLink
+        href="/standards/packages/"
+        variant="unstyled"
+        class="text-action"
+      >
+        Find the right package <Icon name="arrow-right" aria-hidden="true" />
+      </ButtonLink>
+    </div>
+    <div class="ecosystem-list">
+      <a
+        href="https://lumen.santi020k.com"
+        target="_blank"
+        rel="noopener noreferrer"
+      >
+        <span>Lumen</span>
+        <span>Interfaces & interactions</span>
+        <Icon name="arrow-up-right" aria-hidden="true" />
+      </a>
+      <a
+        href="https://theme.santi020k.com"
+        target="_blank"
+        rel="noopener noreferrer"
+      >
+        <span>Theme</span>
+        <span>Tokens, typography & assets</span>
+        <Icon name="arrow-up-right" aria-hidden="true" />
+      </a>
+      <a href="/standards/quality/">
+        <span>Quality</span>
+        <span>Checks & validation</span>
+        <Icon name="arrow-up-right" aria-hidden="true" />
+      </a>
+      <a href="/standards/pull-requests/">
+        <span>Commitprompt</span>
+        <span>Clear, reviewable changes</span>
+        <Icon name="arrow-up-right" aria-hidden="true" />
+      </a>
+    </div>
+  </section>
+  <section class="closing">
+    <p class="eyebrow">A considered starting point</p>
+    <h2>
+      Shared standards.
+      <br />
+      <em>Your project’s context.</em>
+    </h2>
+    <p>
+      Start with a preview. Keep your local preferences. Update deliberately,
+      with a way back.
+    </p>
+    <ButtonLink href="/start/" variant="unstyled" class="primary-action">
+      Set up your agent{' '}
+      <span>
+        <Icon name="arrow-up-right" aria-hidden="true" />
+      </span>
+    </ButtonLink>
+  </section>
+</Base>

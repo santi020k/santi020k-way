@@ -1,0 +1,10 @@
+packages:
+  - apps/*
+  - packages/*
+overrides:
+  '@santi020k/eslint-config-core': 3.0.0
+  '@santi020k/eslint-config-typescript': 3.0.0
+onlyBuiltDependencies:
+  - esbuild
+  - unrs-resolver
+  - workerd

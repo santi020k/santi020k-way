@@ -1,0 +1,6 @@
+# Optional standalone MCP registration after installing the Way CLI.
+# Merge only this section into your configuration. Do not also enable the plugin's MCP.
+# Keep your model, trust, permissions, and credentials local.
+[mcp_servers.santi020k_way]
+command = "way"
+args = ["mcp"]
