@@ -120,6 +120,9 @@ the working tree without automatic fixes, so partially staged changes are never 
 Pre-push checks the complete repository, browser behavior, and portable release packages.
 `prepare` attempts installation with an existing compatible Quality CLI; `hooks:install` requires
 it explicitly. Neither command downloads executables or overwrites another hook manager.
+Installation requires the physical Git worktree root. Automatic setup skips source archives even
+when extracted inside another repository, and explicit setup refuses a non-root directory before
+invoking Quality, so an enclosing repository's hooks cannot be claimed accidentally.
 Installer tests use temporary physical directories and fake tools, never live agent homes.
 
 The reusable Check workflow is the single CI validation definition, following GitHub's

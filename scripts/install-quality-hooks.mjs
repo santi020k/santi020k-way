@@ -1,4 +1,5 @@
 import { execFileSync } from 'node:child_process'
+import { realpathSync } from 'node:fs'
 
 const installHooks = () => {
   // Dependency installation in CI and published archives must not modify Git hooks.
@@ -6,11 +7,19 @@ const installHooks = () => {
 
   const automatic = process.argv.includes('--automatic')
   const guidance = 'Install Quality CLI >=1.2.0 (https://github.com/santi020k/quality/releases), then run pnpm hooks:install.'
+  let repositoryRoot
 
   try {
-    execFileSync('git', ['rev-parse', '--git-dir'], { stdio: 'pipe' })
+    repositoryRoot = execFileSync('git', ['rev-parse', '--show-toplevel'], { encoding: 'utf8', stdio: 'pipe' }).trim()
   } catch (error) {
     if (!automatic) throw error
+
+    return
+  }
+
+  // Git searches parent directories; an extracted archive must not install their hooks.
+  if (realpathSync(repositoryRoot) !== realpathSync(process.cwd())) {
+    if (!automatic) throw new Error('Hook installation must run from the repository root.')
 
     return
   }
