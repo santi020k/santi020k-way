@@ -9,7 +9,7 @@ export const classifyReleaseFamilies = workflows => {
 
     if (/\bdeploy\b/iu.test(content)) families.add('deployment')
 
-    if (content.includes('workflow_dispatch') && /publish-release|npm publish|gh release create/u.test(content)) families.add('manual-release')
+    if (content.includes('workflow_dispatch') && /publish-release|npm publish|gh release create|pnpm (?:run )?release(?:\s|$)/u.test(content)) families.add('manual-release')
   }
 
   if (families.size > 0) return [...families].sort().join(', ')
