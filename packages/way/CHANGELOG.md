@@ -4,6 +4,8 @@
 
 ### Minor Changes
 
+- Clarify the website architecture with a responsive guidance flow, ownership boundaries, decision links, and keyboard and enlarged-text verification.
+
 - Add a human-focused way-of-working guide to the shared catalog, with practical code and workflow examples, a reading map, and clear implementation and delivery expectations.
 - Keep malformed rollback receipt contents out of error output. Share receipt validation with backup discovery, hash current instructions once per listing, and reject non-regular or incorrectly sized immutable references before reading them.
 
