@@ -17,8 +17,9 @@ outside the managed section. No databases or production data are involved.
 
 ## Before the first push
 
-Run `pnpm install --frozen-lockfile`, `pnpm check`, `pnpm format:check`, and
-`pnpm test:browser`. Inspect package contents with `pnpm --filter @santi020k/way pack`.
+Run `pnpm install --frozen-lockfile`, install Chromium with
+`pnpm exec playwright install chromium`, and run `pnpm verify` (repository checks, formatting,
+browser tests, and release archives). Inspect package contents with `pnpm --filter @santi020k/way pack`.
 Obtain a fresh independent review of the complete diff against `main`; resolve findings and
 repeat affected checks. Confirm the intended repository URL and visibility before assigning a
 Git remote. Push and create a release PR only with explicit authorization. Inspect all latest
@@ -40,8 +41,10 @@ versions derive from this package. Follow the same reviewed PR and GitHub workfl
 
 ## Website delivery
 
-The **Deploy website** workflow runs only from `main` and requires the protected `production`
-environment. It validates the build, imports only `CLOUDFLARE_API_TOKEN` from the confirmed
+The **Deploy website** workflow runs automatically on pushes to `main`, with manual dispatch
+available for recovery, and requires the protected `production` environment. Its reusable Check
+job must pass the same `pnpm verify` gate used before local pushes. Only then does the production
+job rebuild the checked revision and import `CLOUDFLARE_API_TOKEN` from the confirmed
 Infisical project using GitHub OIDC, and deploys the static Worker configured in
 `apps/website/wrangler.jsonc`. The target custom domain is `way.santi020k.com`.
 

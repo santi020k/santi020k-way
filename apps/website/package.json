@@ -15,7 +15,7 @@
   "scripts": {
     "dev": "node ../../scripts/build-website-sources.mjs && astro dev --host 127.0.0.1 --port 4328",
     "build": "node ../../scripts/build-website-sources.mjs && astro build",
-    "typecheck": "astro check",
+    "typecheck": "astro check --minimumFailingSeverity warning",
     "preview": "astro preview --host 127.0.0.1 --port 4328"
   },
   "dependencies": {

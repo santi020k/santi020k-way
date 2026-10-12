@@ -1,5 +1,7 @@
 name: Deploy website
 on:
+  push:
+    branches: [main]
   workflow_dispatch: {}
 permissions:
   contents: read
@@ -7,7 +9,10 @@ concurrency:
   group: way-production
   cancel-in-progress: false
 jobs:
+  validate:
+    uses: ./.github/workflows/check.yml
   deploy:
+    needs: validate
     if: github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
     timeout-minutes: 25
@@ -32,9 +37,7 @@ jobs:
           node-version: 22.x
           cache: pnpm
       - run: pnpm install --frozen-lockfile
-      - run: pnpm check
-      - run: pnpm exec playwright install --with-deps chromium
-      - run: pnpm test:browser
+      - run: pnpm build
       - name: Verify explicitly configured deployment targets
         run: node scripts/prepare-deployment.mjs
       - uses: Infisical/secrets-action@d2e351f16c6ca20d17c85e6c992e04bdeb64e87d # v1.0.18

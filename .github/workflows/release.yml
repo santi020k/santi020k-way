@@ -12,7 +12,10 @@ concurrency:
   group: way-release
   cancel-in-progress: false
 jobs:
+  validate:
+    uses: ./.github/workflows/check.yml
   release:
+    needs: validate
     if: github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
     environment: release
@@ -30,10 +33,7 @@ jobs:
           node-version: 24.x
           cache: pnpm
       - run: pnpm install --frozen-lockfile
-      - run: pnpm check
-      - run: pnpm format:check
-      - run: pnpm exec playwright install --with-deps chromium
-      - run: pnpm test:browser
+      - run: pnpm build
       - run: pnpm package:release
       - name: Use the verified OIDC-capable npm CLI
         run: npm install --global npm@12.2.0

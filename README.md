@@ -37,8 +37,21 @@ pnpm way read packages
 pnpm dev
 ```
 
-The website opens at `http://127.0.0.1:4328`. Use `pnpm check`, `pnpm format:check`, and
-`pnpm test:browser` for validation (install Chromium with `pnpm exec playwright install chromium`).
+The website opens at `http://127.0.0.1:4328`. Run `pnpm check` for repository validation or
+`pnpm verify` for the full CI/pre-push gate, including browser tests and release packaging.
+Install Chromium first with `pnpm exec playwright install chromium`.
+
+Install [Quality CLI](https://github.com/santi020k/quality/releases) >=1.2.0, then run
+`pnpm hooks:install`. Dependency installation also installs the configured hooks when Quality is
+available. Pre-commit checks policy, lint, types, and formatting without rewriting staged files;
+commit-msg validates Commitprompt conventions; pre-push runs `pnpm verify`. Missing or outdated
+Quality prints setup guidance during installation, and explicit hook installation fails until it
+is available. CI and source archives skip automatic hook setup. Existing hook managers and
+unmanaged hooks are preserved; resolve a reported conflict before installing.
+
+GitHub Actions runs the same full gate for pull requests and before release publication or
+automatic website deployment from `main`. Production deployment uses the protected `production`
+environment and Infisical OIDC; see the [release plan](docs/release-v0.1.0.md) for setup and recovery.
 
 ## Add it to your agent
 
