@@ -11,7 +11,6 @@ see [the release plan](release-v0.1.0.md). Sibling audit commands remain availab
 | `astro-doctor`        | Changesets                          | Release PR to npm, VS Marketplace, Open VSX, GitHub tags      | Uses optional `CHANGESETS_TOKEN` with built-in-token fallback           |
 | `coolstead`           | Tagged native                       | Reviewed tag to signed/notarized DMG, Sparkle, Homebrew       | Kept tag gate and immutable asset checks                                |
 | `dep-beacon`          | Changesets                          | Release PR to npm and extension registries                    | Added retry and concurrency; uses existing `GH_TOKEN`                   |
-| `difftale`            | Changesets                          | Release PR to npm and extension registries                    | Added optional `CHANGESETS_TOKEN` contract with built-in-token fallback |
 | `eslint-config-basic` | Changesets                          | Release PR to npm, GitHub Releases, and published docs        | Restored release PR using existing `PA_TOKEN`                           |
 | `homebrew-tap`        | Distribution downstream             | Updated by native application release workflows               | Kept as a destination, not a release orchestrator                       |
 | `lumen`               | Changesets                          | Release PR to npm and repository version tag                  | Added optional `CHANGESETS_TOKEN` contract with built-in-token fallback |

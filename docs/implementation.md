@@ -11,6 +11,9 @@ review date describes the guidance, not the current version of a referenced libr
 `packages/way` validates the generated catalog, exposes typed queries, runs the read-only stdio
 MCP server, and manages local instructions. `scripts/build-catalog.mjs` creates its JSON artifact
 and an internal generated module so both Node and Astro bundle the same source safely.
+`packages/way/src/catalog-schema.ts` owns shared build/runtime validation: safe IDs and relative
+Markdown sources, unique identities, a required core entry, ISO review dates, and verified
+SHA-256 hashes. Hashes use the schema-normalized entry order so build and runtime agree.
 
 `skills/way-build`, `skills/way-review`, and `skills/way-release` hold task workflows. The plugin
 builder materializes their linked references from the catalog; generated copies are never edited
@@ -21,8 +24,14 @@ manifests, host adapters, skills, and bundled MCP runtimes. The Claude adapter e
 `apps/website` renders the same catalog with Astro, Lumen, and Theme. It includes search, source
 provenance, architecture decisions, installation examples, light/dark themes and canonical
 metadata for `https://way.santi020k.com`. No catalog service, database, tracking or credentials are
-needed to run it. Documentation templates are served as downloads rather than broken repository
-relative links.
+needed to run it. Catalog links resolve from each document’s owning source to the corresponding website route,
+so the same Markdown remains navigable in the repository. Documentation templates are served
+as downloads rather than broken repository-relative links.
+The architecture page traces authoring, catalog validation, and delivery in reading order, then
+explains read-only retrieval versus explicit CLI setup and links to the accepted decisions. Its
+flow stacks on small screens and uses ordinary links without additional client JavaScript.
+Source and download directories are regenerated from scratch so retired catalog entries and
+templates are removed on incremental builds; other public assets remain intact.
 
 The shared header and footer own site navigation through `apps/website/src/lib/navigation.ts`.
 The compact header stays available while reading; mobile navigation uses Lumen's native dialog
@@ -37,9 +46,18 @@ Lumen and Theme sites. Keep 44px link targets, visible current-route cues, and r
 requires the matching preview hash. Changed instructions receive a private backup receipt;
 rollback is conditional on the current file still matching the installed version. An edited
 managed section is rejected, while personal text outside the section survives updates. Existing
-references are checked for modification, including during a no-op update. Symlink paths are
+references must be regular files of the expected byte size before content comparison, including
+during a no-op update. Pipes and other special files are rejected without blocking the installer. Symlink paths are
 refused and writes are serialized by a local lock. If a process is killed, inspect the directory
 and remove its stale `.way-setup.lock` only after confirming no installer remains running.
+Instruction replacement preserves the original file permissions even under a restrictive process
+umask; backup receipts and new references remain private.
+
+`way backups <agent>` discovers receipt IDs and creation times without returning saved instruction
+text. It validates receipts, rejects symlinks and unsupported file sizes, filters by agent, and
+reports whether the current target still matches each recorded installation. Listing never writes
+or takes an installer lock. Its availability flag is a snapshot; rollback still requires a fresh
+preview and rechecks the target under the existing write lock.
 
 First installation preserves existing guidance, including its size. Santiago's captured global
 file exceeds the default Codex 32 KiB combined instruction budget. Review and manually retire
@@ -47,6 +65,15 @@ superseded personal text after making a backup; the installer never silently rem
 Runtime settings are deliberately separate. `config/` contains optional MCP-only examples;
 merge the relevant section manually, or install the plugin that supplies it. Use only one MCP
 registration per host. No real agent home is modified by repository validation.
+Both existing and proposed instruction files must fit the supported 1 MiB limit. Setup rejects an
+oversized proposal during preview, before creating references or backups, so installed files remain
+readable by updates and rollback. Invalid UTF-8 is rejected before instruction writes; UTF-8 BOMs,
+non-ASCII text and existing line endings round-trip unchanged. Rollback accepts only regular,
+bounded receipt files with valid hashes, timestamps, ordinary permission bits and restored content
+within the instruction size limit. These checks validate receipt structure, not authenticity;
+backup receipts must remain private and trusted. Rollback and backup discovery share receipt
+validation and report malformed receipts without forwarding parser diagnostics that may contain
+private instruction text. Backup discovery hashes the current instructions once per listing.
 
 ## Tooling decisions
 
@@ -72,10 +99,21 @@ type-check gate. `pnpm verify` adds browser tests and versioned release archives
 pre-push and GitHub Actions completion gate. `pnpm test:browser` covers representative routes,
 WCAG checks, responsive overflow, search, theme persistence, keyboard tabs, mobile navigation,
 focus return, no-JavaScript navigation, and footer links. Generated plugin
-MCP servers are exercised from isolated directories without repository dependencies. For host
+MCP servers are exercised from isolated directories without repository dependencies.
+Browser tests start a fresh worktree-local preview on port 4329 (`WAY_TEST_PORT` overrides it);
+the `--ignore-lock` option prevents Astro from auto-backgrounding in agent environments so
+Playwright owns server cleanup. Tests refuse occupied ports and verify the rendered package version to catch stale previews.
+Marketplace manifests are checked alongside their plugin listings and source paths. For host
 validation, run `claude plugin validate` on the Claude package and marketplace; Codex can install
 the generated marketplace into a temporary profile. `pnpm audit:all` remains an optional sibling
 repository audit and is independent of Way's completion gate.
+The presentation audit checks source package manifests under `packages/`, excluding installed
+dependencies, build output, caches, Git metadata and fixtures, as the package-policy audit does.
+Generated copies cannot introduce duplicate findings or replace source metadata checks.
+Release-workflow audits parse YAML and inspect each Changesets action's own `with` mapping.
+Every action needs a nonempty `version` or `version-script` command; unrelated action inputs,
+Node runtime settings and commented commands cannot hide a missing command. The development-only
+`yaml` parser handles block and flow mappings without adding runtime dependencies to the CLI.
 
 ## Hook and delivery ownership
 
@@ -86,6 +124,9 @@ the working tree without automatic fixes, so partially staged changes are never 
 Pre-push checks the complete repository, browser behavior, and portable release packages.
 `prepare` attempts installation with an existing compatible Quality CLI; `hooks:install` requires
 it explicitly. Neither command downloads executables or overwrites another hook manager.
+Installation requires the physical Git worktree root. Automatic setup skips source archives even
+when extracted inside another repository, and explicit setup refuses a non-root directory before
+invoking Quality, so an enclosing repository's hooks cannot be claimed accidentally.
 Installer tests use temporary physical directories and fake tools, never live agent homes.
 
 The reusable Check workflow is the single CI validation definition, following GitHub's

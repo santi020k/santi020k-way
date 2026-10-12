@@ -1,9 +1,11 @@
 import { createHash, randomUUID } from 'node:crypto'
 import { constants } from 'node:fs'
 import {
+  chmod,
   lstat,
   mkdir,
   open,
+  readdir,
   readFile,
   rename,
   unlink,
@@ -19,15 +21,18 @@ export type Agent = 'codex' | 'claude'
 
 const start = '<!-- santi020k-way:start -->'
 const end = '<!-- santi020k-way:end -->'
+const maximumInstructionBytes = 1_048_576
+// JSON can escape each original byte into six ASCII bytes, plus receipt metadata.
+const maximumReceiptBytes = maximumInstructionBytes * 6 + 4096
 const digest = (value: string) => createHash('sha256').update(value).digest('hex')
 
 const receiptSchema = z.object({
   id: z.uuid(),
   agent: z.enum(['codex', 'claude']),
-  before: z.string().nullable(),
-  afterHash: z.string(),
-  createdAt: z.string(),
-  mode: z.number().int()
+  before: z.string().refine(value => Buffer.byteLength(value) <= maximumInstructionBytes, 'Backup instructions exceed the supported 1 MiB size.').nullable(),
+  afterHash: z.string().regex(/^[a-f0-9]{64}$/u),
+  createdAt: z.iso.datetime(),
+  mode: z.number().int().min(0).max(0o777)
 })
 
 export interface Plan {
@@ -40,6 +45,12 @@ export interface Plan {
   changed: boolean
   references: Record<string, string>
   mode: number
+}
+
+export interface BackupSummary {
+  id: string
+  createdAt: string
+  canRollback: boolean
 }
 
 const missing = (error: unknown): boolean => error instanceof Error && 'code' in error && error.code === 'ENOENT'
@@ -65,6 +76,36 @@ const ensureSafePath = async (path: string): Promise<void> => {
   }
 }
 
+const decodeUtf8 = (bytes: Uint8Array): string => {
+  try {
+    // Preserve a UTF-8 BOM as content so setup and rollback round-trip every byte.
+    return new TextDecoder('utf-8', { fatal: true, ignoreBOM: true }).decode(bytes)
+  } catch (error) {
+    throw new Error('Way files must contain valid UTF-8. No instruction write was performed.', { cause: error })
+  }
+}
+
+const readReceipt = async (path: string, id: string): Promise<z.infer<typeof receiptSchema>> => {
+  await ensureSafePath(path)
+
+  const information = await lstat(path)
+
+  if (!information.isFile() || information.size > maximumReceiptBytes)
+    throw new Error('Backup receipt must be a regular file within the supported size.')
+
+  try {
+    const input: unknown = JSON.parse(decodeUtf8(await readFile(path)))
+    const receipt = receiptSchema.parse(input)
+
+    if (receipt.id !== id) throw new Error('Mismatched backup identity.')
+
+    return receipt
+  } catch {
+    // Parser diagnostics can quote private instruction text. Never forward them.
+    throw new Error(`Backup ${id} is invalid. Inspect its private receipt before retrying.`)
+  }
+}
+
 const readTarget = async (
   path: string
 ): Promise<{ content: string | null, mode: number }> => {
@@ -76,12 +117,12 @@ const readTarget = async (
     if (!stat.isFile())
       throw new Error('The instruction target must be a regular file.')
 
-    if (stat.size > 1_048_576)
+    if (stat.size > maximumInstructionBytes)
       throw new Error(
         'The existing instructions exceed the supported 1 MiB size.'
       )
 
-    return { content: await readFile(path, 'utf8'), mode: stat.mode & 0o777 }
+    return { content: decodeUtf8(await readFile(path)), mode: stat.mode & 0o777 }
   } catch (error) {
     if (missing(error)) return { content: null, mode: 0o600 }
 
@@ -175,9 +216,15 @@ export const planSetup = async (
     .join('\n')}\n`
 
   const block = `${start}\n<!-- content-sha256: ${digest(body)} -->\n${body}${end}`
+  const after = managedContent(current.content ?? '', block)
+
+  if (Buffer.byteLength(after) > maximumInstructionBytes)
+    throw new Error(
+      'The proposed instructions exceed the supported 1 MiB size. Shorten personal guidance before installing.'
+    )
 
   return makePlan(
-    agent, home, current.content, managedContent(current.content ?? '', block), references, current.mode
+    agent, home, current.content, after, references, current.mode
   )
 }
 
@@ -192,6 +239,9 @@ const atomicWrite = async (
 
   try {
     await writeFile(temp, text, { flag: 'wx', mode })
+
+    // Creation applies the process umask; replacement must retain the original mode.
+    await chmod(temp, mode)
 
     await ensureSafePath(path)
 
@@ -255,7 +305,14 @@ export const applySetup = async (
       ))
         throw error
 
-      if ((await readFile(path, 'utf8')) !== content)
+      const information = await lstat(path)
+
+      if (!information.isFile() || information.size !== Buffer.byteLength(content))
+        throw new Error(
+          'An immutable reference is not a regular file with the expected size. Restore it before updating.', { cause: error }
+        )
+
+      if (!(await readFile(path)).equals(Buffer.from(content)))
         throw new Error(
           'An immutable reference was modified. Restore it before updating.', { cause: error }
         )
@@ -309,13 +366,9 @@ export const planRollback = async (
 
   const home = resolve(directory)
   const receiptPath = join(home, 'way', 'backups', `${id}.json`)
+  const receipt = await readReceipt(receiptPath, id)
 
-  await ensureSafePath(receiptPath)
-
-  const input: unknown = JSON.parse(await readFile(receiptPath, 'utf8'))
-  const receipt = receiptSchema.parse(input)
-
-  if (receipt.agent !== agent || receipt.id !== id)
+  if (receipt.agent !== agent)
     throw new Error('Backup does not match the requested agent.')
 
   const target = join(home, agent === 'codex' ? 'AGENTS.md' : 'CLAUDE.md')
@@ -345,5 +398,59 @@ export const applyRollback = async (
 
     if (plan.after === null) await unlink(plan.target)
     else await atomicWrite(plan.target, plan.after, plan.mode)
+  })
+}
+
+export const listBackups = async (
+  agent: Agent,
+  directory: string
+): Promise<BackupSummary[]> => {
+  if (!isAbsolute(directory))
+    throw new Error('Agent home must be an absolute path.')
+
+  const home = resolve(directory)
+  const backups = join(home, 'way', 'backups')
+
+  await ensureSafePath(backups)
+
+  const current = await readTarget(
+    join(home, agent === 'codex' ? 'AGENTS.md' : 'CLAUDE.md')
+  )
+
+  const currentHash = current.content === null ? null : digest(current.content)
+  let files: string[]
+
+  try {
+    files = await readdir(backups)
+  } catch (error) {
+    if (missing(error)) return []
+
+    throw error
+  }
+
+  const summaries: BackupSummary[] = []
+
+  for (const file of files) {
+    if (!file.endsWith('.json')) continue
+
+    const id = file.slice(0, -5)
+
+    if (!z.uuid().safeParse(id).success) continue
+
+    const receipt = await readReceipt(join(backups, file), id)
+
+    if (receipt.agent !== agent) continue
+
+    summaries.push({
+      id,
+      createdAt: receipt.createdAt,
+      canRollback: currentHash === receipt.afterHash
+    })
+  }
+
+  return summaries.sort((left, right) => {
+    const chronology = Date.parse(right.createdAt) - Date.parse(left.createdAt)
+
+    return chronology || left.id.localeCompare(right.id)
   })
 }

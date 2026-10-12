@@ -2,6 +2,8 @@ import { access, readdir, readFile } from 'node:fs/promises'
 import { basename, dirname, join, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
 
+import { parse } from 'yaml'
+
 import { classifyReleaseFamilies } from './lib/release-families.mjs'
 
 const projectDirectory = resolve(dirname(fileURLToPath(import.meta.url)), '..')
@@ -50,8 +52,34 @@ const getDocumentedGitHubToken = async repositoryDirectory => {
   return tokenNames.find(tokenName => environmentExample.includes(`${tokenName}=`))
 }
 
+/** @param {unknown} value @returns {value is Record<string, unknown>} */
+const isRecord = value => value !== null && typeof value === 'object' && !Array.isArray(value)
+
+const changesetsSteps = workflow => {
+  /** @type {unknown} */
+  let document
+
+  try {
+    document = parse(workflow.content, { maxAliasCount: 100 })
+  } catch {
+    throw new Error(`Cannot audit invalid workflow YAML: ${workflow.path}`)
+  }
+
+  if (!isRecord(document) || !isRecord(document.jobs)) return []
+
+  return Object.values(document.jobs).flatMap(job => {
+    if (!isRecord(job) || !Array.isArray(job.steps)) return []
+
+    return job.steps.filter(step => isRecord(step) &&
+      typeof step.uses === 'string' && step.uses.startsWith('changesets/action@'))
+  })
+}
+
 const getChangesetsIssues = (workflows, documentedGitHubToken) => {
-  const changesetsWorkflows = workflows.filter(workflow => workflow.content.includes('changesets/action@'))
+  const changesetsWorkflows = workflows.map(workflow => ({
+    ...workflow,
+    steps: changesetsSteps(workflow)
+  })).filter(workflow => workflow.steps.length > 0)
 
   if (changesetsWorkflows.length === 0) return []
 
@@ -70,10 +98,15 @@ const getChangesetsIssues = (workflows, documentedGitHubToken) => {
     issues.push('release PR permission')
   }
 
-  if (
-    !combinedChangesetsWorkflows.includes('version:') &&
-    !combinedChangesetsWorkflows.includes('version-script:')
-  ) {
+  if (changesetsWorkflows.some(workflow => workflow.steps.some(step => {
+    if (!isRecord(step) || !isRecord(step.with)) return true
+
+    return !['version', 'version-script'].some(key => {
+      const command = step.with[key]
+
+      return typeof command === 'string' && command.trim().length > 0
+    })
+  }))) {
     issues.push('version command')
   }
 

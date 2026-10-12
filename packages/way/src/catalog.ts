@@ -1,31 +1,13 @@
 import { z } from 'zod'
 
 import data from './generated/catalog.js'
+import type { Standard } from './catalog-schema.js'
+import { parseCatalog } from './catalog-schema.js'
 
-export const standardSchema = z.object({
-  id: z.string(),
-  title: z.string(),
-  summary: z.string(),
-  kind: z.enum(['standard', 'decision', 'reference']),
-  scope: z.string(),
-  status: z.enum(['accepted', 'reference']),
-  source: z.string(),
-  reviewedAt: z.string(),
-  tags: z.array(z.string()),
-  contentHash: z.string(),
-  content: z.string()
-})
+export type { Catalog, Standard } from './catalog-schema.js'
+export { standardSchema } from './catalog-schema.js'
 
-const catalogSchema = z.object({
-  version: z.string(),
-  hash: z.string(),
-  entries: z.array(standardSchema)
-})
-
-export type Standard = z.infer<typeof standardSchema>
-export type Catalog = z.infer<typeof catalogSchema>
-
-export const readCatalog = (): Catalog => catalogSchema.parse(data)
+export const readCatalog = () => parseCatalog(data)
 
 export const getStandard = (id: string, catalog = readCatalog()): Standard => {
   const entry = catalog.entries.find(item => item.id === id)

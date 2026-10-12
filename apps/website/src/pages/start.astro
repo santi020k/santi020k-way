@@ -37,7 +37,8 @@ const setup = ['codex', 'claude'].map(agent => ({
       <span class="row-number">01 / Build from source</span>
       <h2>Prepare the local release.</h2>
       <p>
-        Version {readCatalog().version} is a local release candidate. From the Way repository,
+        Build version {readCatalog().version} from the Way repository, or download
+        its archives from GitHub Releases. To build locally,
         install the locked dependencies and build the CLI, both plugin
         distributions, and this website. Node 22.22.3 or newer and pnpm 10.34.3
         are required.

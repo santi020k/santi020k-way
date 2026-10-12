@@ -3,7 +3,7 @@ import { join } from 'node:path'
 import { parseArgs } from 'node:util'
 
 import { getStandard, readCatalog, searchStandards } from './catalog.js'
-import { applyRollback, applySetup, planRollback, planSetup } from './setup.js'
+import { applyRollback, applySetup, listBackups, planRollback, planSetup } from './setup.js'
 
 const print = (value: unknown): void => {
   console.log(JSON.stringify(value, null, 2))
@@ -32,7 +32,7 @@ const main = async (): Promise<void> => {
 
   if (values.help || !command) {
     console.log(
-      'The santi020k Way\n\nway list\nway search <query>\nway read <id>\nway mcp\nway setup <codex|claude> [--home <absolute-directory>] [--apply <preview-hash>]\nway rollback <codex|claude> --backup <id> [--home <directory>] [--apply <preview-hash>]\n\nSetup and rollback only preview until --apply is supplied. Runtime settings remain local.'
+      'The santi020k Way\n\nway list\nway search <query>\nway read <id>\nway mcp\nway setup <codex|claude> [--home <absolute-directory>] [--apply <preview-hash>]\nway backups <codex|claude> [--home <absolute-directory>]\nway rollback <codex|claude> --backup <id> [--home <directory>] [--apply <preview-hash>]\n\nSetup and rollback only preview until --apply is supplied. Runtime settings remain local.'
     )
 
     return
@@ -41,15 +41,22 @@ const main = async (): Promise<void> => {
   if (
     command !== 'setup' &&
     command !== 'rollback' &&
-    (values.home || values.apply || values.backup)
+    command !== 'backups' &&
+    (values.home !== undefined || values.apply !== undefined || values.backup !== undefined)
   )
     throw new Error('Setup options only apply to setup or rollback.')
 
-  if ((command === 'list' || command === 'mcp') && argument)
+  if ((command === 'list' || command === 'mcp') && argument !== undefined)
     throw new Error('This command takes no arguments.')
 
   if (positionals.length > 2)
     throw new Error('Unexpected arguments. Quote multi-word search queries.')
+
+  if (values.apply === '')
+    throw new Error('--apply requires a non-empty preview hash.')
+
+  if (command === 'backups' && (values.apply !== undefined || values.backup !== undefined))
+    throw new Error('Backups is read-only and accepts only --home.')
 
   if (command === 'mcp') {
     const { runMcp } = await import('./mcp.js')
@@ -71,20 +78,24 @@ const main = async (): Promise<void> => {
     return
   }
 
-  if (command === 'search' && argument) {
+  if (command === 'search') {
+    if (!argument) throw new Error('Search requires a query. Run way search <query>.')
+
     print(searchStandards(argument))
 
     return
   }
 
-  if (command === 'read' && argument) {
+  if (command === 'read') {
+    if (!argument) throw new Error('Read requires a standard ID. Run way read <id>.')
+
     console.log(getStandard(argument).content)
 
     return
   }
 
   if (
-    (command !== 'setup' && command !== 'rollback') ||
+    (command !== 'setup' && command !== 'rollback' && command !== 'backups') ||
     (argument !== 'codex' && argument !== 'claude')
   )
     throw new Error('Unknown command or agent. Run way --help.')
@@ -96,8 +107,18 @@ const main = async (): Promise<void> => {
       process.env.CLAUDE_CONFIG_DIR) ??
       join(homedir(), argument === 'codex' ? '.codex' : '.claude')
 
+  if (command === 'backups') {
+    print({
+      agent: argument,
+      backups: await listBackups(argument, home),
+      note: 'Use an ID with way rollback to review a fresh approval hash. Availability is a snapshot; later edits can block rollback.'
+    })
+
+    return
+  }
+
   if (command === 'setup') {
-    if (values.backup) throw new Error('--backup only applies to rollback.')
+    if (values.backup !== undefined) throw new Error('--backup only applies to rollback.')
 
     if (values.apply) print(await applySetup(argument, home, values.apply))
     else {

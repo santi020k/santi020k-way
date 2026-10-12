@@ -3,6 +3,8 @@ import assert from 'node:assert/strict'
 import { AxeBuilder } from '@axe-core/playwright'
 import { expect, test } from '@playwright/test'
 
+import { readCatalog } from '../packages/way/dist/catalog.js'
+
 for (const route of ['/', '/standards/', '/start/', '/architecture/', '/standards/design/']) {
   test(`${route} is accessible and fits the viewport`, async ({ page }, testInfo) => {
     const errors: string[] = []
@@ -16,6 +18,8 @@ for (const route of ['/', '/standards/', '/start/', '/architecture/', '/standard
     expect(response.status()).toBe(200)
 
     await expect(page.locator('h1')).toHaveCount(1)
+
+    await expect(page.locator('footer .footer-version')).toContainText(`v${readCatalog().version}`)
 
     await expect(page.locator('link[rel="canonical"]')).toHaveAttribute('href', `https://way.santi020k.com${route}`)
 
@@ -44,7 +48,7 @@ test('search has results, an empty state, and reset', async ({ page }) => {
 
   await search.fill('')
 
-  await expect(page.locator('[data-search]:visible')).toHaveCount(12)
+  await expect(page.locator('[data-search]:visible')).toHaveCount(readCatalog().entries.length)
 })
 
 test('theme and keyboard code tabs remain usable', async ({ page }) => {
