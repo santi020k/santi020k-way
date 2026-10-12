@@ -1,6 +1,7 @@
 import { createHash, randomUUID } from 'node:crypto'
 import { constants } from 'node:fs'
 import {
+  chmod,
   lstat,
   mkdir,
   open,
@@ -19,6 +20,7 @@ export type Agent = 'codex' | 'claude'
 
 const start = '<!-- santi020k-way:start -->'
 const end = '<!-- santi020k-way:end -->'
+const maximumInstructionBytes = 1_048_576
 const digest = (value: string) => createHash('sha256').update(value).digest('hex')
 
 const receiptSchema = z.object({
@@ -76,7 +78,7 @@ const readTarget = async (
     if (!stat.isFile())
       throw new Error('The instruction target must be a regular file.')
 
-    if (stat.size > 1_048_576)
+    if (stat.size > maximumInstructionBytes)
       throw new Error(
         'The existing instructions exceed the supported 1 MiB size.'
       )
@@ -175,9 +177,15 @@ export const planSetup = async (
     .join('\n')}\n`
 
   const block = `${start}\n<!-- content-sha256: ${digest(body)} -->\n${body}${end}`
+  const after = managedContent(current.content ?? '', block)
+
+  if (Buffer.byteLength(after) > maximumInstructionBytes)
+    throw new Error(
+      'The proposed instructions exceed the supported 1 MiB size. Shorten personal guidance before installing.'
+    )
 
   return makePlan(
-    agent, home, current.content, managedContent(current.content ?? '', block), references, current.mode
+    agent, home, current.content, after, references, current.mode
   )
 }
 
@@ -192,6 +200,9 @@ const atomicWrite = async (
 
   try {
     await writeFile(temp, text, { flag: 'wx', mode })
+
+    // Creation applies the process umask; replacement must retain the original mode.
+    await chmod(temp, mode)
 
     await ensureSafePath(path)
 
