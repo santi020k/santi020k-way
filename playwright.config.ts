@@ -6,7 +6,8 @@ if (!Number.isInteger(port) || port < 1024 || port > 65535)
   throw new Error('WAY_TEST_PORT must be an integer between 1024 and 65535.')
 
 const baseURL = `http://127.0.0.1:${port}`
-const command = `pnpm --filter @santi020k/way-website exec astro preview --host 127.0.0.1 --port ${port}`
+const preview = 'pnpm --filter @santi020k/way-website exec astro preview'
+const command = `${preview} --host 127.0.0.1 --port ${port} --ignore-lock`
 
 export default defineConfig({
   testDir: './tests',

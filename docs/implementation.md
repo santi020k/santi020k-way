@@ -88,7 +88,8 @@ WCAG checks, responsive overflow, search, theme persistence, keyboard tabs, mobi
 focus return, no-JavaScript navigation, and footer links. Generated plugin
 MCP servers are exercised from isolated directories without repository dependencies.
 Browser tests start a fresh worktree-local preview on port 4329 (`WAY_TEST_PORT` overrides it);
-they refuse occupied ports and verify the rendered package version to catch stale previews.
+the `--ignore-lock` option prevents Astro from auto-backgrounding in agent environments so
+Playwright owns server cleanup. Tests refuse occupied ports and verify the rendered package version to catch stale previews.
 Marketplace manifests are checked alongside their plugin listings and source paths. For host
 validation, run `claude plugin validate` on the Claude package and marketplace; Codex can install
 the generated marketplace into a temporary profile. `pnpm audit:all` remains an optional sibling
