@@ -41,6 +41,8 @@ await test('CLI reports missing arguments, unknown commands, and invalid options
     [['search'], /Search requires a query/u],
     [['read'], /Read requires a standard ID/u],
     [['list', 'extra'], /takes no arguments/u],
+    [['list', ''], /takes no arguments/u],
+    [['mcp', ''], /takes no arguments/u],
     [['search', 'two', 'words'], /Quote multi-word/u],
     [['list', '--home', ''], /Setup options only/u],
     [['list', '--apply', ''], /Setup options only/u],

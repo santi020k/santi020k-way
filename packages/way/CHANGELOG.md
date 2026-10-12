@@ -1,5 +1,11 @@
 # @santi020k/way
 
+## 0.2.0
+
+### Minor Changes
+
+- Harden local instruction setup and rollback with strict UTF-8 preservation and bounded receipt validation. Validate catalog metadata and SHA-256 integrity in builds and runtime reads, and reject empty arguments on no-argument CLI commands. Browser verification now requires a fresh preview server and checks its rendered version.
+
 ## 0.1.0
 
 Initial release: a versioned standards catalog, read-only MCP server, and CLI that

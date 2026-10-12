@@ -1,0 +1,52 @@
+# v0.2.0 release plan
+
+The user selected **0.2.0** for continued reliability work on 2026-10-12. The local integration
+branch is `release/v0.2.0`, based on the fetched `main` commit `d99b14d`. It carries forward the
+committed hardening from `82950d0`; the separate unfinished v0.1.1 worktree is preserved.
+Publishing and deployment require separate authorization.
+
+## Contents
+
+- Preserve valid UTF-8 instruction bytes, including BOMs and non-ASCII guidance; refuse invalid
+  encoding before setup can replace personal content.
+- Validate rollback receipt type, size, hash, timestamp, restored instruction size and permission
+  range before restoring a file.
+- Validate shared catalog metadata and content integrity during generation and runtime reads.
+  Reject unsafe IDs/sources, duplicate identities, missing core guidance and mismatched hashes.
+- Reject empty positional arguments on commands that accept none, including the MCP server.
+- Start browser tests against a fresh preview on a configurable dedicated port, and verify the
+  rendered package version so an unrelated running checkout cannot pass the gate.
+- Include prior committed setup, CLI, artifact and publication hardening with its regression tests.
+
+## Compatibility and migration
+
+No CLI commands or package exports are removed. Correctly generated existing receipts remain
+usable. Invalid UTF-8 instructions must be repaired manually after backing up their original bytes;
+Way does not guess an encoding. Malformed or oversized receipts now fail instead of restoring
+unsupported content or permissions. Receipts remain trusted local files, not signed backups.
+
+Catalog hash serialization now follows the shared schema field order. Updating creates a new
+immutable reference directory; existing references and receipts are retained. The approval hash
+must always come from a fresh preview with the version being installed. No live agent homes or
+runtime settings are modified by repository validation.
+
+## Validation and release
+
+Run `pnpm install --frozen-lockfile` and `pnpm verify`, which includes policy, lint, types, tests,
+builds, artifact checks, formatting, browser behavior and release packaging. Add a minor Changeset
+for `@santi020k/way` and run `pnpm changeset version`; generated plugin/site versions derive from
+that package. Review the full diff against `main` independently before an authorized first push.
+Use a release PR into `main`, inspect all review feedback and required checks, then use the
+GitHub Release workflow from the merged commit. Do not publish locally.
+
+Production configuration and provider recovery remain documented in the
+[v0.1.0 delivery plan](release-v0.1.0.md). Website deployment follows a merge to `main`; local
+integration does not authorize that merge or deployment.
+
+## Recovery
+
+Do not move published tags or replace package versions. Fix distribution defects with a new
+version and the release workflow. For local setup, preview rollback using the private receipt;
+later instruction edits intentionally block restoration. For website regressions, revert through
+a reviewed PR and verify deployment smoke checks. Retain old references and backups until the
+new installation is accepted. No database or production-data migration is involved.

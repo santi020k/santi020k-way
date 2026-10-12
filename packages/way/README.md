@@ -3,7 +3,7 @@
 Versioned design, engineering and architecture guidance for Santiago-owned projects. Includes a
 local CLI, a read-only MCP catalog, and preview-based Codex / Claude Code instruction setup.
 
-This is the initial 0.1.0 release candidate. It is usable from a local build; npm publication is a
+This is the 0.2.0 release candidate. It is usable from a local build; npm publication is a
 separate release step. Requires Node 22.22.3 or newer.
 
 ```sh
@@ -21,7 +21,9 @@ Setup and rollback preview by default. Review the target, content and approval h
 repeating with `--apply`. Setup preserves text outside its managed section, backs up changed
 instructions, rejects symlinks and stale previews, and keeps versioned references beneath the
 chosen agent home. Rollback refuses to overwrite later edits. Treat backup receipts as private:
-they contain your previous instruction file.
+they contain your previous instruction file. Instructions must be valid UTF-8; a BOM and original
+line endings are preserved. Rollback validates receipt size, restored instruction size, timestamps,
+hashes, and ordinary file permission bits before writing.
 
 The default homes are `CODEX_HOME` or `~/.codex`, and `CLAUDE_CONFIG_DIR` or `~/.claude`.
 `--home` overrides either with an absolute physical directory. On macOS, `/tmp` is a symlink;
@@ -46,7 +48,8 @@ const guidance = getStandard('design', catalog)
 const matches = searchStandards('architecture', 5, catalog)
 ```
 
-Sources carry scope, review dates and content hashes. Package versions and project-specific
+Sources carry scope, review dates and content hashes. Builds and catalog reads validate source
+metadata, unique IDs, the required core entry, and SHA-256 content and catalog integrity. Package versions and project-specific
 contracts must still be verified in the consuming repository.
 
 Website target: [way.santi020k.com](https://way.santi020k.com). Author:

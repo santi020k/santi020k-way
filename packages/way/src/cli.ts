@@ -45,7 +45,7 @@ const main = async (): Promise<void> => {
   )
     throw new Error('Setup options only apply to setup or rollback.')
 
-  if ((command === 'list' || command === 'mcp') && argument)
+  if ((command === 'list' || command === 'mcp') && argument !== undefined)
     throw new Error('This command takes no arguments.')
 
   if (positionals.length > 2)

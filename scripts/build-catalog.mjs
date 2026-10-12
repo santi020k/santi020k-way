@@ -1,11 +1,13 @@
 import { createHash } from 'node:crypto'
 import { mkdir, readFile, writeFile } from 'node:fs/promises'
 
+import { catalogMetadataSchema, parseCatalog, standardSchema } from '../packages/way/src/catalog-schema.ts'
+
 const root = new URL('../', import.meta.url)
 
-const metadata = JSON.parse(
+const metadata = catalogMetadataSchema.parse(JSON.parse(
   await readFile(new URL('standards/catalog.json', root), 'utf8')
-)
+))
 
 const pkg = JSON.parse(
   await readFile(new URL('packages/way/package.json', root), 'utf8')
@@ -17,15 +19,15 @@ const entries = await Promise.all(
   metadata.map(async entry => {
     const content = await readFile(new URL(entry.source, root), 'utf8')
 
-    return { ...entry, content, contentHash: hash(content) }
+    return standardSchema.parse({ ...entry, content, contentHash: hash(content) })
   })
 )
 
-const catalog = {
+const catalog = parseCatalog({
   version: pkg.version,
   hash: hash(JSON.stringify(entries)),
   entries
-}
+})
 
 const destination = new URL('packages/way/dist/data/', root)
 

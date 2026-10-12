@@ -22,7 +22,7 @@ Santiago-owned projects—available to Codex, Claude Code, and people from the s
 Read the guides at [way.santi020k.com](https://way.santi020k.com), explore the
 [public source](https://github.com/santi020k/santi020k-way), or download the CLI and agent plugins
 from [GitHub Releases](https://github.com/santi020k/santi020k-way/releases).
-Publication and deployment follow the [release plan](docs/release-v0.1.0.md).
+Publication and deployment follow the [release plan](docs/release-v0.2.0.md).
 
 ## Start locally
 
@@ -39,6 +39,8 @@ pnpm dev
 
 The website opens at `http://127.0.0.1:4328`. Run `pnpm check` for repository validation or
 `pnpm verify` for the full CI/pre-push gate, including browser tests and release packaging.
+Browser tests start their own preview at `http://127.0.0.1:4329`; set `WAY_TEST_PORT` to an unused
+port when running concurrent worktrees. An existing server is never reused.
 Install Chromium first with `pnpm exec playwright install chromium`.
 
 Install [Quality CLI](https://github.com/santi020k/quality/releases) >=1.2.0, then run
@@ -51,7 +53,7 @@ unmanaged hooks are preserved; resolve a reported conflict before installing.
 
 GitHub Actions runs the same full gate for pull requests and before release publication or
 automatic website deployment from `main`. Production deployment uses the protected `production`
-environment and Infisical OIDC; see the [release plan](docs/release-v0.1.0.md) for setup and recovery.
+environment and Infisical OIDC; see the [release plan](docs/release-v0.2.0.md) for setup and recovery.
 
 ## Add it to your agent
 

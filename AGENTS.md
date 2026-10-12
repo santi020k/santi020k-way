@@ -1,7 +1,7 @@
 # Agent instructions
 
 This Turborepo publishes reusable conventions for the sibling `santi020k` projects.
-Read `README.md`, `docs/implementation.md`, and the selected release plan before implementation.
+Read `README.md`, `docs/implementation.md`, and `docs/release-v0.2.0.md` before implementation.
 
 - Canonical guidance is indexed in `standards/catalog.json`; edit the owning source.
 - Never edit generated `dist/` or `packages/way/src/generated/` output.
@@ -10,7 +10,7 @@ Read `README.md`, `docs/implementation.md`, and the selected release plan before
 - Runtime settings and credentials stay local. Do not copy config.toml, settings.json or auth stores.
 - Run `pnpm check`, `pnpm format:check`, and browser tests for website changes.
 - `pnpm audit:all` audits sibling repositories; it is independent of Way's local completion gate.
-- Initial integration target: `release/v0.1.0`. Publishing and deployment require separate authorization.
+- Current integration target: `release/v0.2.0`. Publishing and deployment require separate authorization.
 
 - Keep examples generic and free of credentials.
 - Prefer executable checks over conventions that cannot be verified.

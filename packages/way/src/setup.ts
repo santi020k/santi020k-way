@@ -26,10 +26,10 @@ const digest = (value: string) => createHash('sha256').update(value).digest('hex
 const receiptSchema = z.object({
   id: z.uuid(),
   agent: z.enum(['codex', 'claude']),
-  before: z.string().nullable(),
-  afterHash: z.string(),
-  createdAt: z.string(),
-  mode: z.number().int()
+  before: z.string().refine(value => Buffer.byteLength(value) <= maximumInstructionBytes, 'Backup instructions exceed the supported 1 MiB size.').nullable(),
+  afterHash: z.string().regex(/^[a-f0-9]{64}$/u),
+  createdAt: z.iso.datetime(),
+  mode: z.number().int().min(0).max(0o777)
 })
 
 export interface Plan {
@@ -67,6 +67,15 @@ const ensureSafePath = async (path: string): Promise<void> => {
   }
 }
 
+const decodeUtf8 = (bytes: Uint8Array): string => {
+  try {
+    // Preserve a UTF-8 BOM as content so setup and rollback round-trip every byte.
+    return new TextDecoder('utf-8', { fatal: true, ignoreBOM: true }).decode(bytes)
+  } catch (error) {
+    throw new Error('Way files must contain valid UTF-8. No instruction write was performed.', { cause: error })
+  }
+}
+
 const readTarget = async (
   path: string
 ): Promise<{ content: string | null, mode: number }> => {
@@ -83,7 +92,7 @@ const readTarget = async (
         'The existing instructions exceed the supported 1 MiB size.'
       )
 
-    return { content: await readFile(path, 'utf8'), mode: stat.mode & 0o777 }
+    return { content: decodeUtf8(await readFile(path)), mode: stat.mode & 0o777 }
   } catch (error) {
     if (missing(error)) return { content: null, mode: 0o600 }
 
@@ -323,7 +332,13 @@ export const planRollback = async (
 
   await ensureSafePath(receiptPath)
 
-  const input: unknown = JSON.parse(await readFile(receiptPath, 'utf8'))
+  const receiptStat = await lstat(receiptPath)
+
+  // JSON can escape each original byte into six ASCII bytes, plus receipt metadata.
+  if (!receiptStat.isFile() || receiptStat.size > maximumInstructionBytes * 6 + 4096)
+    throw new Error('Backup receipt must be a regular file within the supported size.')
+
+  const input: unknown = JSON.parse(decodeUtf8(await readFile(receiptPath)))
   const receipt = receiptSchema.parse(input)
 
   if (receipt.agent !== agent || receipt.id !== id)
