@@ -2,7 +2,8 @@
 
 The user selected **0.1.0** as the first working release. The local integration branch is
 `release/v0.1.0`; `main` holds the preserved pre-implementation standards baseline. This plan
-prepares publication but does not authorize pushes, PRs, publishing, deployment or secret changes.
+prepares publication. The user authorized open-source publication and the initial deployment on
+2026-10-12. Production credential creation requires the separate, exact-target approval described below.
 
 ## Contents
 
@@ -50,6 +51,18 @@ Infisical project/environment/path. Configure these GitHub environment variables
 `INFISICAL_SECRET_PATH`, and `INFISICAL_DOMAIN`. Use a least-privileged identity bound to the
 repository and protected environment. Store the Cloudflare token in that exact Infisical path.
 The existing local `.infisical.json` is not exported or changed by this implementation.
+
+The production target is Cloudflare account `5ca91d76ebcd9f998ab424010e0431c5`, zone
+`santi020k.com`, and Worker `santi020k-way`. Infisical project **The santi020k Way**
+(`85fb45bd-da04-4edb-a9f2-7c8d88c7f82a`) owns the deployment credential in `prod` at
+`/website/deploy`, named `CLOUDFLARE_API_TOKEN`. Its GitHub OIDC identity must trust only this
+repository's `production` environment on `main` and read only that deployment path. No secret
+values belong in GitHub repository files or variables. Infisical Secrets Action v1.0.18 supports
+the workflow's `project-id` and single `secret-name` inputs; its reviewed commit is pinned.
+
+Credential bootstrap rollback is to revoke the new Cloudflare token and remove the new identity's
+project access. This stops future deployment access without changing any deployed assets. npm
+publication remains an optional separate workflow input; GitHub release archives work independently.
 
 The workflow records a build SHA in the site's `version.json`; post-deploy verification checks
 that SHA and the home, standards, setup, and sitemap routes. No production claim is valid until

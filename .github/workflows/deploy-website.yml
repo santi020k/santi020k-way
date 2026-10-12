@@ -37,7 +37,7 @@ jobs:
       - run: pnpm test:browser
       - name: Verify explicitly configured deployment targets
         run: node scripts/prepare-deployment.mjs
-      - uses: Infisical/secrets-action@v1.0.12
+      - uses: Infisical/secrets-action@d2e351f16c6ca20d17c85e6c992e04bdeb64e87d # v1.0.18
         with:
           method: oidc
           identity-id: ${{ vars.INFISICAL_IDENTITY_ID }}

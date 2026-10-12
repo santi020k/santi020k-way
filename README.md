@@ -19,8 +19,10 @@
 Shared design language, library choices, architecture decisions, and working agreements for
 Santiago-owned projects—available to Codex, Claude Code, and people from the same versioned sources.
 
-**v0.1.0 is prepared locally.** The website target is [way.santi020k.com](https://way.santi020k.com);
-remote publication and deployment require the setup described in the [release plan](docs/release-v0.1.0.md).
+Read the guides at [way.santi020k.com](https://way.santi020k.com), explore the
+[public source](https://github.com/santi020k/santi020k-way), or download the CLI and agent plugins
+from [GitHub Releases](https://github.com/santi020k/santi020k-way/releases).
+Publication and deployment follow the [release plan](docs/release-v0.1.0.md).
 
 ## Start locally
 
