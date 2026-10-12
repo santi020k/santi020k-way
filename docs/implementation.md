@@ -110,8 +110,10 @@ repository audit and is independent of Way's completion gate.
 The presentation audit checks source package manifests under `packages/`, excluding installed
 dependencies, build output, caches, Git metadata and fixtures, as the package-policy audit does.
 Generated copies cannot introduce duplicate findings or replace source metadata checks.
-The release audit matches complete `version:` or `version-script:` keys; Node runtime settings
-and commented-out commands do not satisfy the version-command safeguard.
+Release-workflow audits parse YAML and inspect each Changesets action's own `with` mapping.
+Every action needs a nonempty `version` or `version-script` command; unrelated action inputs,
+Node runtime settings and commented commands cannot hide a missing command. The development-only
+`yaml` parser handles block and flow mappings without adding runtime dependencies to the CLI.
 
 ## Hook and delivery ownership
 

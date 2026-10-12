@@ -13,8 +13,8 @@ deployment on 2026-10-12. npm publication remains disabled until its publisher i
   decision links and a setup path; verify keyboard use and enlarged-text reflow.
 - Add a way-of-working guide, shared through the catalog, CLI, and website, with
   practical examples, a reading map, and implementation versus delivery expectations.
-- Require an actual version-command key in Changesets workflow audits; `node-version:` settings
-  and commented-out commands no longer produce a false pass.
+- Parse workflow YAML and require a nonempty version command on every Changesets action; unrelated
+  action inputs and commented-out commands no longer produce a false pass.
 
 - Prevent automatic hook installation from claiming an enclosing repository when a source archive
   is extracted inside it. Explicit hook installation now requires the Git worktree root.
