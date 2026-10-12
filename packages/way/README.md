@@ -4,7 +4,7 @@ Versioned design, engineering and architecture guidance for Santiago-owned proje
 local CLI, a read-only MCP catalog, and preview-based Codex / Claude Code instruction setup.
 
 This is the initial 0.1.0 release candidate. It is usable from a local build; npm publication is a
-separate release step. Requires Node 22.18 or newer.
+separate release step. Requires Node 22.22.3 or newer.
 
 ```sh
 way list

@@ -50,8 +50,8 @@ registration per host. No real agent home is modified by repository validation.
 
 ## Tooling decisions
 
-The workspace retains Node >=22.18 and pnpm 10.34.3. ESLint Config Basic and Astro 3.0.0 are the
-newest compatible preset versions; later presets require Node >=22.19. Core, TypeScript, and
+The workspace requires Node >=22.22.3 and pnpm 10.34.3. ESLint Config Basic and Astro presets remain
+pinned at 3.0.0. Core, TypeScript, and
 Astro lint contracts are selected explicitly, avoiding automatic activation of the deprecated
 integrations package. TypeScript 6 is the newest stable version accepted by Astro's checker.
 ESLint owns JS/TS/Astro formatting; Prettier checks documents, JSON, YAML and CSS independently.

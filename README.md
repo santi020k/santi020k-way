@@ -26,7 +26,7 @@ Publication and deployment follow the [release plan](docs/release-v0.1.0.md).
 
 ## Start locally
 
-Requires Node >=22.18 and pnpm 10.34.3.
+Requires Node >=22.22.3 and pnpm 10.34.3.
 
 ```sh
 pnpm install --frozen-lockfile

@@ -143,7 +143,7 @@ for (const host of ['codex', 'claude']) {
     outfile: fileURLToPath(new URL('runtime/cli.mjs', plugin)),
     bundle: true,
     platform: 'node',
-    target: 'node22.18',
+    target: 'node22.22.3',
     format: 'esm',
     banner: {
       js: 'import { createRequire as wayCreateRequire } from \'node:module\'; const require = wayCreateRequire(import.meta.url);'

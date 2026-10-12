@@ -8,7 +8,7 @@
   },
   "homepage": "https://way.santi020k.com",
   "engines": {
-    "node": ">=22.18.0"
+    "node": ">=22.22.3"
   },
   "name": "@santi020k/way-website",
   "private": true,
