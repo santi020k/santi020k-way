@@ -3,7 +3,7 @@
 Versioned design, engineering and architecture guidance for Santiago-owned projects. Includes a
 local CLI, a read-only MCP catalog, and preview-based Codex / Claude Code instruction setup.
 
-This is the 0.2.0 release candidate. It is usable from a local build; npm publication is a
+Versioned CLI and plugin archives are distributed through GitHub Releases; npm publication is a
 separate release step. Requires Node 22.22.3 or newer.
 
 ```sh
