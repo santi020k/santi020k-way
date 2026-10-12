@@ -2,6 +2,8 @@
 
 ## 0.2.0
 
+- Restrict hook installation to the owning Git worktree root, preserving enclosing repositories when using source archives. Keep presentation audits focused on source manifests while ignoring dependencies, generated output, caches, and fixtures.
+
 ### Minor Changes
 
 - Clarify the website architecture with a responsive guidance flow, ownership boundaries, decision links, and keyboard and enlarged-text verification.
