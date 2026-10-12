@@ -107,6 +107,9 @@ Marketplace manifests are checked alongside their plugin listings and source pat
 validation, run `claude plugin validate` on the Claude package and marketplace; Codex can install
 the generated marketplace into a temporary profile. `pnpm audit:all` remains an optional sibling
 repository audit and is independent of Way's completion gate.
+The presentation audit checks source package manifests under `packages/`, excluding installed
+dependencies, build output, caches, Git metadata and fixtures, as the package-policy audit does.
+Generated copies cannot introduce duplicate findings or replace source metadata checks.
 
 ## Hook and delivery ownership
 

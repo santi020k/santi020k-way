@@ -9,6 +9,17 @@ const excludedRepositories = new Set(['lumen-production-cleanup'])
 const licenseReviewExceptions = new Set(['extensions'])
 const marketplacePackageNames = new Set(['santi020k-theme'])
 
+// Match the source boundaries used by the repository's package-policy audit.
+const ignoredPackageDirectories = new Set([
+  '.git',
+  '.next',
+  '.turbo',
+  'build',
+  'dist',
+  'fixtures',
+  'node_modules'
+])
+
 const pathExists = async filePath => {
   try {
     await access(filePath)
@@ -146,6 +157,8 @@ const collectPackageManifests = async directory => {
     const entryPath = join(directory, entry.name)
 
     if (entry.isDirectory()) {
+      if (ignoredPackageDirectories.has(entry.name)) continue
+
       manifests.push(...(await collectPackageManifests(entryPath)))
     } else if (entry.isFile() && entry.name === 'package.json') {
       manifests.push(entryPath)
