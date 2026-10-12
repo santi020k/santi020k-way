@@ -34,6 +34,7 @@ pnpm build
 pnpm way list
 pnpm way search "design"
 pnpm way read packages
+pnpm way backups codex
 pnpm dev
 ```
 

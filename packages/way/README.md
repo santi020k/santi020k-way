@@ -3,7 +3,7 @@
 Versioned design, engineering and architecture guidance for Santiago-owned projects. Includes a
 local CLI, a read-only MCP catalog, and preview-based Codex / Claude Code instruction setup.
 
-This is the initial 0.1.0 release candidate. It is usable from a local build; npm publication is a
+Versioned CLI and plugin archives are distributed through GitHub Releases; npm publication is a
 separate release step. Requires Node 22.22.3 or newer.
 
 ```sh
@@ -14,6 +14,7 @@ way mcp
 way setup codex
 way setup codex --apply <preview-hash>
 way setup claude --home /absolute/test-directory
+way backups codex
 way rollback codex --backup <backup-id>
 ```
 
@@ -22,6 +23,13 @@ repeating with `--apply`. Setup preserves text outside its managed section, back
 instructions, rejects symlinks and stale previews, and keeps versioned references beneath the
 chosen agent home. Rollback refuses to overwrite later edits. Treat backup receipts as private:
 they contain your previous instruction file.
+
+Use `way backups <agent>` to recover saved backup IDs without opening private receipts. It returns
+only each ID, creation time, and `canRollback` snapshot, newest first. A false value means the
+current instructions no longer match that receipt; later edits are protected. Always preview
+`way rollback` for a fresh approval hash, even when the listing reports availability. Listing is
+read-only, filters the selected agent, and rejects invalid or symlinked receipts without printing
+their private content. `--apply` and `--backup` are not accepted by this command.
 
 The default homes are `CODEX_HOME` or `~/.codex`, and `CLAUDE_CONFIG_DIR` or `~/.claude`.
 `--home` overrides either with an absolute physical directory. On macOS, `/tmp` is a symlink;

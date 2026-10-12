@@ -47,6 +47,9 @@ await test('CLI reports missing arguments, unknown commands, and invalid options
     [['read', 'core', '--backup', ''], /Setup options only/u],
     [['setup', 'codex', '--apply', ''], /non-empty preview hash/u],
     [['setup', 'codex', '--backup', ''], /only applies to rollback/u],
+    [['backups', 'codex', '--apply', 'invalid'], /read-only/u],
+    [['backups', 'codex', '--backup', ''], /read-only/u],
+    [['backups', 'other'], /Unknown command or agent/u],
     [['rollback', 'codex'], /requires --backup/u],
     [['setup', 'other'], /Unknown command or agent/u],
     [['other'], /Unknown command or agent/u],
@@ -89,6 +92,17 @@ await test('CLI setup and rollback require reviewed hashes and use only the sele
     assert.equal(installed.status, 0, installed.stderr)
 
     const { backup } = z.object({ backup: z.string() }).parse(parseJson(installed.stdout))
+    const listing = run('backups', agent, '--home', home)
+
+    assert.equal(listing.status, 0, listing.stderr)
+
+    const { backups } = z.object({
+      backups: z.array(z.object({ id: z.string(), canRollback: z.boolean() }))
+    }).parse(parseJson(listing.stdout))
+
+    assert.deepEqual(backups, [{ id: backup, canRollback: true }])
+
+    assert.ok(!listing.stdout.includes('santi020k-way:start'))
 
     assert.match(await readFile(target, 'utf8'), /santi020k-way:start/u)
 

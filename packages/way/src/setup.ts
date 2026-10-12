@@ -5,6 +5,7 @@ import {
   lstat,
   mkdir,
   open,
+  readdir,
   readFile,
   rename,
   unlink,
@@ -42,6 +43,12 @@ export interface Plan {
   changed: boolean
   references: Record<string, string>
   mode: number
+}
+
+export interface BackupSummary {
+  id: string
+  createdAt: string
+  canRollback: boolean
 }
 
 const missing = (error: unknown): boolean => error instanceof Error && 'code' in error && error.code === 'ENOENT'
@@ -356,5 +363,80 @@ export const applyRollback = async (
 
     if (plan.after === null) await unlink(plan.target)
     else await atomicWrite(plan.target, plan.after, plan.mode)
+  })
+}
+
+export const listBackups = async (
+  agent: Agent,
+  directory: string
+): Promise<BackupSummary[]> => {
+  if (!isAbsolute(directory))
+    throw new Error('Agent home must be an absolute path.')
+
+  const home = resolve(directory)
+  const backups = join(home, 'way', 'backups')
+
+  await ensureSafePath(backups)
+
+  const current = await readTarget(
+    join(home, agent === 'codex' ? 'AGENTS.md' : 'CLAUDE.md')
+  )
+
+  let files: string[]
+
+  try {
+    files = await readdir(backups)
+  } catch (error) {
+    if (missing(error)) return []
+
+    throw error
+  }
+
+  const summaries: BackupSummary[] = []
+
+  for (const file of files) {
+    if (!file.endsWith('.json')) continue
+
+    const id = file.slice(0, -5)
+
+    if (!z.uuid().safeParse(id).success) continue
+
+    const path = join(backups, file)
+
+    await ensureSafePath(path)
+
+    const information = await lstat(path)
+
+    // JSON can encode each original byte as a six-byte Unicode escape.
+    if (!information.isFile() || information.size > maximumInstructionBytes * 6 + 1024)
+      throw new Error(`Backup ${id} is not a supported regular receipt file.`)
+
+    let receipt: z.infer<typeof receiptSchema>
+
+    try {
+      const input: unknown = JSON.parse(await readFile(path, 'utf8'))
+
+      receipt = receiptSchema.parse(input)
+
+      z.iso.datetime().parse(receipt.createdAt)
+
+      if (receipt.id !== id) throw new Error('Mismatched backup identity.')
+    } catch {
+      throw new Error(`Backup ${id} is invalid. Inspect its private receipt before retrying.`)
+    }
+
+    if (receipt.agent !== agent) continue
+
+    summaries.push({
+      id,
+      createdAt: receipt.createdAt,
+      canRollback: current.content !== null && digest(current.content) === receipt.afterHash
+    })
+  }
+
+  return summaries.sort((left, right) => {
+    const chronology = Date.parse(right.createdAt) - Date.parse(left.createdAt)
+
+    return chronology || left.id.localeCompare(right.id)
   })
 }

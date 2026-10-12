@@ -45,6 +45,12 @@ and remove its stale `.way-setup.lock` only after confirming no installer remain
 Instruction replacement preserves the original file permissions even under a restrictive process
 umask; backup receipts and new references remain private.
 
+`way backups <agent>` discovers receipt IDs and creation times without returning saved instruction
+text. It validates receipts, rejects symlinks and unsupported file sizes, filters by agent, and
+reports whether the current target still matches each recorded installation. Listing never writes
+or takes an installer lock. Its availability flag is a snapshot; rollback still requires a fresh
+preview and rechecks the target under the existing write lock.
+
 First installation preserves existing guidance, including its size. Santiago's captured global
 file exceeds the default Codex 32 KiB combined instruction budget. Review and manually retire
 superseded personal text after making a backup; the installer never silently removes it.
