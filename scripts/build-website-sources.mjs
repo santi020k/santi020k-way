@@ -1,12 +1,17 @@
-import { cp, mkdir, writeFile } from 'node:fs/promises'
+import { cp, mkdir, rm, writeFile } from 'node:fs/promises'
 
 import { readCatalog } from '../packages/way/dist/catalog.js'
 
 const root = new URL('../', import.meta.url)
+const downloads = new URL('apps/website/public/downloads/', root)
 
-await cp(new URL('templates/', root), new URL('apps/website/public/downloads/', root), { recursive: true })
+await rm(downloads, { recursive: true, force: true })
+
+await cp(new URL('templates/', root), downloads, { recursive: true })
 
 const sources = new URL('apps/website/public/sources/', root)
+
+await rm(sources, { recursive: true, force: true })
 
 await mkdir(sources, { recursive: true })
 
