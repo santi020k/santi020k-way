@@ -27,6 +27,9 @@ metadata for `https://way.santi020k.com`. No catalog service, database, tracking
 needed to run it. Catalog links resolve from each document’s owning source to the corresponding website route,
 so the same Markdown remains navigable in the repository. Documentation templates are served
 as downloads rather than broken repository-relative links.
+The architecture page traces authoring, catalog validation, and delivery in reading order, then
+explains read-only retrieval versus explicit CLI setup and links to the accepted decisions. Its
+flow stacks on small screens and uses ordinary links without additional client JavaScript.
 Source and download directories are regenerated from scratch so retired catalog entries and
 templates are removed on incremental builds; other public assets remain intact.
 

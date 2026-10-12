@@ -1,74 +1,168 @@
 ---
-import { Icon } from '@santi020k/lumen-astro'
+import { Card, Icon } from '@santi020k/lumen-astro'
 
 import Base from '../layouts/Base.astro'
 ---
 
 <Base
   title="Architecture"
-  description="How the shared standards, read-only catalog, agent plugins, and documentation website fit together in a pnpm Turborepo."
+  description="Follow Way’s guidance from versioned Markdown to a validated local catalog, agent plugins, and the website. See what each part owns and what stays on your machine."
 >
-  <header class="page-intro">
-    <p class="eyebrow">Built to stay understandable</p>
-    <h1>
-      One source.
-      <br />
-      <em>Several ways in.</em>
-    </h1>
-    <p class="lead">
-      Markdown holds the decisions. A typed catalog makes them discoverable.
-      Each agent gets the integration it understands.
-    </p>
-  </header>
-  <section
-    class="architecture-flow"
-    aria-label="How guidance reaches people and agents"
-  >
+  <header class="page-intro architecture-intro">
     <div>
-      <p class="tiny-label">01 / Source</p>
-      <h2>Standards & decisions</h2>
-      <p>Versioned Markdown, explicit scope, and source metadata.</p>
-      <code>standards/ + docs/</code>
-    </div>
-    <Icon name="arrow-down" aria-hidden="true" />
-    <div>
-      <p class="tiny-label">02 / Shared package</p>
-      <h2>Catalog, CLI & MCP</h2>
-      <p>
-        Search and retrieve locally. Preview configuration changes with a
-        rollback path.
-      </p>
-      <code>@santi020k/way</code>
-    </div>
-    <Icon name="arrow-down" aria-hidden="true" />
-    <div class="destinations">
-      <div>
-        <h3>Codex</h3>
-        <p>Global guidance + plugin</p>
-      </div>
-      <div>
-        <h3>Claude Code</h3>
-        <p>Global guidance + plugin</p>
-      </div>
-      <div>
-        <h3>The website</h3>
-        <p>Readable, searchable references</p>
-      </div>
-    </div>
-  </section>
-  <section class="section">
-    <div class="section-heading">
-      <p class="eyebrow">Intentional boundaries</p>
-      <h2>
-        Every part
+      <p class="eyebrow">Architecture / How Way fits together</p>
+      <h1>
+        One source.
         <br />
-        has an owner.
-      </h2>
+        <em>Several ways in.</em>
+      </h1>
+      <p class="lead">
+        Write the guidance once. Build a shared catalog. Read it on the web or
+        bring it into your agent, with the same decisions behind every entry point.
+      </p>
+      <a class="text-action" href="#guidance-flow">
+        Follow the guidance <Icon name="arrow-down" aria-hidden="true" />
+      </a>
+    </div>
+    <aside class="architecture-summary" aria-label="At a glance">
+      <p class="tiny-label">Shared guidance, clear boundaries</p>
+      <dl>
+        <div>
+          <dt>Versioned sources</dt>
+          <dd>Markdown and source metadata in Git.</dd>
+        </div>
+        <div>
+          <dt>Local retrieval</dt>
+          <dd>A packaged catalog, with no hosted search service.</dd>
+        </div>
+        <div>
+          <dt>Deliberate updates</dt>
+          <dd>Preview changes. Keep a recovery path.</dd>
+        </div>
+      </dl>
+    </aside>
+  </header>
+
+  <section id="guidance-flow" class="architecture-map" aria-labelledby="flow-title">
+    <div class="architecture-map-heading">
+      <div>
+        <p class="eyebrow">From source to reference</p>
+        <h2 id="flow-title">One build. Shared context.</h2>
+      </div>
+      <p>Turborepo builds the catalog before its plugin and website consumers.</p>
+    </div>
+    <ol class="architecture-stages">
+      <li>
+        <Card class="architecture-stage">
+          <p class="tiny-label"><span>01</span> / Author</p>
+          <h3>Standards & decisions</h3>
+          <p>
+            The owning Markdown files hold the guidance. The catalog index
+            records each reference’s scope, source, tags, and review date.
+          </p>
+          <div class="architecture-paths">
+            <code>standards/ + docs/</code>
+            <code>standards/catalog.json</code>
+          </div>
+          <p class="architecture-stage-note">Edit the owning source.</p>
+        </Card>
+        <span class="architecture-connector" aria-hidden="true">
+          <Icon name="arrow-right" />
+        </span>
+      </li>
+      <li>
+        <Card class="architecture-stage architecture-stage-core">
+          <p class="tiny-label"><span>02</span> / Build</p>
+          <h3>A validated catalog</h3>
+          <p>
+            The shared package validates metadata and content hashes. Its CLI
+            and read-only MCP server search and retrieve the packaged references.
+          </p>
+          <div class="architecture-paths">
+            <code>@santi020k/way</code>
+            <code>packages/way/</code>
+          </div>
+          <p class="architecture-stage-note">Generate outputs; keep sources authoritative.</p>
+        </Card>
+        <span class="architecture-connector" aria-hidden="true">
+          <Icon name="arrow-right" />
+        </span>
+      </li>
+      <li>
+        <Card class="architecture-stage">
+          <p class="tiny-label"><span>03</span> / Use</p>
+          <h3>Choose your entry point</h3>
+          <ul class="architecture-destinations">
+            <li>
+              <strong>Codex & Claude Code</strong>
+              <span>Generated plugins with skills and local MCP retrieval.</span>
+            </li>
+            <li>
+              <strong>The website</strong>
+              <span>Readable, searchable references from the same catalog.</span>
+            </li>
+            <li>
+              <strong>Global instructions</strong>
+              <span>Managed separately through explicit CLI setup.</span>
+            </li>
+          </ul>
+          <p class="architecture-stage-note">Adapt delivery to each host.</p>
+        </Card>
+      </li>
+    </ol>
+    <p class="architecture-map-caption">
+      <Icon name="arrow-up-right" aria-hidden="true" />
+      Theme owns brand tokens. Lumen owns component contracts. Way points to
+      those sources; current repository evidence takes precedence over snapshots.
+    </p>
+  </section>
+
+  <section class="section" aria-labelledby="boundaries-title">
+    <div class="section-heading">
+      <p class="eyebrow">Access & ownership</p>
+      <h2 id="boundaries-title">Read freely.<br /> Change deliberately.</h2>
+      <p>
+        Looking up a standard and installing instructions are separate operations.
+        Your agent’s runtime configuration stays under your control.
+      </p>
+    </div>
+    <dl class="architecture-boundaries">
+      <div>
+        <dt><Icon name="search" aria-hidden="true" /> Search & retrieve</dt>
+        <dd>
+          The MCP reads the packaged catalog. It does not read arbitrary files
+          or change your agent’s configuration.
+        </dd>
+      </div>
+      <div>
+        <dt><Icon name="terminal" aria-hidden="true" /> Preview & install</dt>
+        <dd>
+          CLI setup requires the exact preview hash before writing managed
+          instructions and versioned references. It preserves surrounding text
+          and retains a private backup receipt.
+        </dd>
+      </div>
+      <div>
+        <dt><Icon name="shield-check" aria-hidden="true" /> Keep local control</dt>
+        <dd>
+          Models, permissions, trusted directories, credentials, and history stay
+          outside setup’s write scope. Rollback refuses to erase later instruction edits.
+        </dd>
+      </div>
+    </dl>
+  </section>
+
+  <section class="section" aria-labelledby="decisions-title">
+    <div class="section-heading">
+      <p class="eyebrow">The reasoning behind the system</p>
+      <h2 id="decisions-title">Decisions you<br /> can inspect.</h2>
+      <p>Read the context, alternatives, and consequences behind these boundaries.</p>
     </div>
     <div class="area-list">
       <a class="area-row" href="/standards/0001-shared-sources/">
         <span class="row-number">01</span>
         <div>
+          <p class="tiny-label">Accepted decision</p>
           <h3>Share sources; adapt delivery.</h3>
           <p>
             Why the catalog is local, the plugins are generated, and Lumen keeps
@@ -80,6 +174,7 @@ import Base from '../layouts/Base.astro'
       <a class="area-row" href="/standards/0002-local-configuration/">
         <span class="row-number">02</span>
         <div>
+          <p class="tiny-label">Accepted decision</p>
           <h3>Keep machine configuration local.</h3>
           <p>
             Why a guidance update preserves your settings, requires an exact
@@ -90,4 +185,261 @@ import Base from '../layouts/Base.astro'
       </a>
     </div>
   </section>
+  <div class="architecture-next">
+    <div>
+      <p class="eyebrow">Put the architecture to work</p>
+      <h2>Start with a preview.</h2>
+    </div>
+    <a class="text-action" href="/start/">
+      Set up your agent <Icon name="arrow-right" aria-hidden="true" />
+    </a>
+  </div>
 </Base>
+
+<style>
+  .section {
+    padding-block: 4.5rem;
+  }
+  .section > * {
+    min-width: 0;
+    overflow-wrap: anywhere;
+  }
+  .area-row {
+    grid-template-columns: 1.5rem minmax(0, 1fr) 1.1rem;
+  }
+  .text-action .ui-icon {
+    width: 1.1rem;
+    flex-shrink: 0;
+  }
+  .architecture-intro {
+    display: grid;
+    grid-template-columns: minmax(0, 1.5fr) minmax(0, 0.8fr);
+    align-items: center;
+    gap: 5rem;
+  }
+  .architecture-intro .text-action {
+    margin-top: 1.4rem;
+  }
+  .architecture-summary {
+    border-left: 1px solid var(--site-line);
+    padding-left: 2rem;
+  }
+  .architecture-summary dl {
+    display: grid;
+    gap: 1.2rem;
+    margin: 1.5rem 0 0;
+  }
+  .architecture-summary dt {
+    font-size: 0.8125rem;
+    font-weight: 600;
+  }
+  .architecture-summary dd {
+    margin: 0.25rem 0 0;
+    color: var(--site-ink-soft);
+    font-size: 0.75rem;
+  }
+  .architecture-map {
+    padding-block: 2rem 0;
+    scroll-margin-top: 7rem;
+  }
+  .architecture-map-heading {
+    display: flex;
+    align-items: end;
+    justify-content: space-between;
+    gap: 2rem;
+    margin-bottom: 2rem;
+  }
+  .architecture-map-heading .eyebrow {
+    margin-bottom: 0.8rem;
+  }
+  .architecture-map-heading h2,
+  .architecture-next h2 {
+    font-size: clamp(1.75rem, 3vw, 2.4rem);
+  }
+  .architecture-map-heading > p {
+    max-width: 20rem;
+    color: var(--site-ink-soft);
+    font-size: 0.8125rem;
+  }
+  .architecture-stages {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 2.5rem;
+    padding: 0;
+    margin: 0;
+    list-style: none;
+  }
+  .architecture-stages > li {
+    position: relative;
+    min-width: 0;
+  }
+  .architecture-stage {
+    overflow-wrap: anywhere;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    padding: 1.6rem;
+    border: 1px solid var(--site-line);
+    border-radius: 1.2rem;
+    background: var(--site-surface);
+    color: var(--site-ink);
+    box-shadow: none;
+  }
+  .architecture-stage-core {
+    border-color: var(--site-accent);
+  }
+  .architecture-stage .tiny-label span {
+    color: var(--site-accent);
+  }
+  .architecture-stage h3 {
+    margin-block: 1.2rem 0.85rem;
+    font-size: 1.25rem;
+  }
+  .architecture-stage > p:not(.tiny-label),
+  .architecture-destinations {
+    font-size: 0.8125rem;
+    color: var(--site-ink-soft);
+  }
+  .architecture-paths {
+    display: grid;
+    gap: 0.4rem;
+    margin-block: 1.2rem;
+    color: var(--site-accent);
+    font-size: 0.7rem;
+    overflow-wrap: anywhere;
+  }
+  .architecture-stage > .architecture-stage-note {
+    border-top: 1px solid var(--site-line);
+    padding-top: 1rem;
+    margin-top: auto;
+    font-size: 0.6875rem;
+  }
+  .architecture-connector {
+    position: absolute;
+    left: 100%;
+    top: 50%;
+    width: 2.5rem;
+    display: flex;
+    justify-content: center;
+    color: var(--site-accent);
+  }
+  .architecture-destinations {
+    display: grid;
+    gap: 1rem;
+    list-style: none;
+    padding: 0;
+    margin: 0 0 1.2rem;
+  }
+  .architecture-destinations strong,
+  .architecture-destinations span {
+    display: block;
+  }
+  .architecture-destinations strong {
+    color: var(--site-ink);
+    font-size: 0.75rem;
+    font-weight: 600;
+  }
+  .architecture-destinations span {
+    font-size: 0.75rem;
+    margin-top: 0.25rem;
+  }
+  .architecture-map-caption {
+    display: flex;
+    align-items: start;
+    gap: 0.75rem;
+    margin-top: 1.5rem;
+    color: var(--site-ink-soft);
+    font-size: 0.75rem;
+    max-width: 49rem;
+  }
+  .architecture-map-caption .ui-icon {
+    color: var(--site-accent);
+    margin-top: 0.15rem;
+    flex-shrink: 0;
+  }
+  .architecture-boundaries {
+    margin: 0;
+  }
+  .architecture-boundaries > div + div {
+    border-top: 1px solid var(--site-line);
+    margin-top: 1.5rem;
+    padding-top: 1.5rem;
+  }
+  .architecture-boundaries dt {
+    display: flex;
+    gap: 0.75rem;
+    align-items: center;
+    font-size: 1rem;
+    font-weight: 500;
+  }
+  .architecture-boundaries .ui-icon {
+    color: var(--site-accent);
+  }
+  .architecture-boundaries dd {
+    margin: 0.65rem 0 0 1.85rem;
+    font-size: 0.8125rem;
+    color: var(--site-ink-soft);
+  }
+  .architecture-next {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 2rem;
+    padding-block: 3rem;
+  }
+  .architecture-next .eyebrow {
+    margin-bottom: 0.75rem;
+  }
+  @media (max-width: 950px) {
+    .architecture-intro {
+      gap: 2rem;
+    }
+    .architecture-stages {
+      gap: 1.75rem;
+    }
+    .architecture-stage {
+      padding: 1.25rem;
+    }
+    .architecture-connector {
+      width: 1.75rem;
+    }
+  }
+  @media (max-width: 700px) {
+    .architecture-intro {
+      grid-template-columns: 1fr;
+      gap: 2.5rem;
+      padding-bottom: 2rem;
+    }
+    .architecture-summary {
+      padding-left: 1.25rem;
+    }
+    .architecture-map-heading {
+      align-items: start;
+      flex-direction: column;
+      gap: 1rem;
+    }
+    .architecture-map-heading > p {
+      max-width: 100%;
+    }
+    .architecture-stages {
+      grid-template-columns: 1fr;
+      gap: 2.5rem;
+    }
+    .architecture-stage {
+      padding: 1.5rem;
+    }
+    .architecture-connector {
+      top: 100%;
+      left: calc(50% - 1.25rem);
+      width: 2.5rem;
+      height: 2.5rem;
+      align-items: center;
+      transform: rotate(90deg);
+    }
+    .architecture-next {
+      flex-direction: column;
+      align-items: start;
+      gap: 1rem;
+    }
+  }
+</style>
