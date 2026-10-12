@@ -136,9 +136,13 @@ test('mobile navigation fits narrow and short screens and releases focus on desk
     document.documentElement.style.fontSize = '200%'
   })
 
-  expect(await dialog.evaluate(element => element.scrollWidth <= element.clientWidth)).toBe(true)
+  for (const width of [390, 375, 320]) {
+    await page.setViewportSize({ width, height: 844 })
 
-  await expect(dialog.getByRole('button', { name: 'Close navigation' })).toBeInViewport()
+    expect(await dialog.evaluate(element => element.scrollWidth <= element.clientWidth)).toBe(true)
+
+    await expect(dialog.getByRole('button', { name: 'Close navigation' })).toBeInViewport()
+  }
 
   await dialog.getByRole('button', { name: 'Close navigation' }).click()
 

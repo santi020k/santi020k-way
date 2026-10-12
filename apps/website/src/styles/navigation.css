@@ -209,6 +209,7 @@ html:has(.mobile-navigation[open]) {
 }
 .mobile-navigation strong {
   display: block;
+  overflow-wrap: anywhere;
   font-size: 1.4rem;
   font-weight: 500;
   letter-spacing: -0.04em;

@@ -40,6 +40,20 @@ try {
 
     assert.equal(hostManifest.skills, './skills/')
 
+    if (host === 'codex') {
+      for (const field of ['displayName', 'shortDescription', 'longDescription', 'developerName', 'category']) {
+        assert.equal(typeof hostManifest.interface?.[field], 'string', `Missing Codex interface.${field}`)
+
+        assert.ok(hostManifest.interface[field].trim().length > 0)
+      }
+
+      assert.ok(hostManifest.interface.displayName.length <= 30)
+
+      assert.ok(hostManifest.interface.shortDescription.length <= 30)
+
+      assert.ok(Array.isArray(hostManifest.interface.capabilities) && hostManifest.interface.capabilities.length > 0)
+    }
+
     for (const skill of await readdir(join(plugin, 'skills'))) {
       const content = await readFile(join(plugin, 'skills', skill, 'SKILL.md'), 'utf8')
 

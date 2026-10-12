@@ -2,6 +2,8 @@ import { access, readdir, readFile } from 'node:fs/promises'
 import { basename, dirname, join, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
 
+import { classifyReleaseFamilies } from './lib/release-families.mjs'
+
 const projectDirectory = resolve(dirname(fileURLToPath(import.meta.url)), '..')
 const projectsDirectory = resolve(projectDirectory, '..')
 const checkMode = process.argv.includes('--check')
@@ -46,22 +48,6 @@ const getDocumentedGitHubToken = async repositoryDirectory => {
   const tokenNames = ['CHANGESETS_TOKEN', 'GH_TOKEN', 'PA_TOKEN']
 
   return tokenNames.find(tokenName => environmentExample.includes(`${tokenName}=`))
-}
-
-const classifyRepository = workflows => {
-  const combinedWorkflows = workflows
-    .map(workflow => workflow.content)
-    .join('\n')
-
-  if (combinedWorkflows.includes('changesets/action@')) return 'changesets'
-
-  if (/tags:\s*\n\s*-\s*['"]?v/.test(combinedWorkflows)) return 'tagged'
-
-  if (/\bdeploy\b/i.test(combinedWorkflows)) return 'deployment'
-
-  if (workflows.length > 0) return 'automation-only'
-
-  return 'none'
 }
 
 const getChangesetsIssues = (workflows, documentedGitHubToken) => {
@@ -134,7 +120,7 @@ let issueCount = 0
 
 for (const repositoryDirectory of repositoryDirectories) {
   const workflows = await readWorkflowFiles(repositoryDirectory)
-  const releaseFamily = classifyRepository(workflows)
+  const releaseFamily = classifyReleaseFamilies(workflows)
 
   const documentedGitHubToken =
     await getDocumentedGitHubToken(repositoryDirectory)

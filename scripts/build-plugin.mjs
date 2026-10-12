@@ -72,7 +72,22 @@ for (const host of ['codex', 'claude']) {
       host === 'claude' ?
         '.claude-plugin/plugin.json' :
         '.codex-plugin/plugin.json', plugin
-    ), { ...metadata, skills: './skills/', mcpServers: './.mcp.json' }
+    ), {
+      ...metadata,
+      skills: './skills/',
+      mcpServers: './.mcp.json',
+      ...(host === 'codex' ?
+        { interface: {
+          displayName: 'The santi020k Way',
+          shortDescription: 'Shared engineering standards',
+          longDescription: pkg.description,
+          developerName: 'Santiago Molina',
+          category: 'Developer Tools',
+          capabilities: ['Read engineering standards', 'Apply reusable workflows'],
+          websiteURL: pkg.homepage
+        } } :
+        {})
+    }
   )
 
   if (host === 'claude')

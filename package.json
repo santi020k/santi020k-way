@@ -19,7 +19,7 @@
     "lint": "pnpm --filter @santi020k/way build && eslint . --max-warnings=0",
     "lint:fix": "pnpm --filter @santi020k/way build && eslint . --fix --max-warnings=0",
     "typecheck": "turbo run typecheck && tsc -p tsconfig.json --noEmit",
-    "test": "turbo run test",
+    "test": "turbo run test && node --test scripts/lib/*.test.mjs",
     "test:browser": "playwright test",
     "check:artifacts": "node scripts/check-artifacts.mjs",
     "format": "pnpm --filter @santi020k/way build && eslint . --fix --max-warnings=0 && prettier --write \"**/*.{md,json,yml,yaml,css}\"",
