@@ -20,8 +20,11 @@ jobs:
           node-version: 22.x
           cache: pnpm
       - run: pnpm install --frozen-lockfile
+      - name: Check repository before browser setup
+        run: pnpm check
       - run: pnpm exec playwright install --with-deps chromium
-      - run: pnpm verify
+      - name: Verify browser behavior and release archives
+        run: pnpm test:browser && pnpm package:release
       - uses: actions/upload-artifact@v6
         if: always()
         with:

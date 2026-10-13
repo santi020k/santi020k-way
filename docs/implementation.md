@@ -131,6 +131,9 @@ Installer tests use temporary physical directories and fake tools, never live ag
 
 The reusable Check workflow is the single CI validation definition, following GitHub's
 [reusable workflow contract](https://docs.github.com/en/actions/how-tos/reuse-automations/reuse-workflows).
+It runs the repository checks before installing Chromium, then runs browser tests and release
+packaging. These stages preserve the complete `pnpm verify` gate; a failed stage stops dependent
+work while browser diagnostics remain available on failure.
 Pull requests call it directly; main pushes enter Deploy website, which requires it before the
 production job. Release publication calls it too. This avoids duplicate main-push checks while
 keeping deployment credentials out of validation jobs. Deployment and release rebuild their own
